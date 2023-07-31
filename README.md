@@ -3,7 +3,7 @@
 This repository contains the implementation of the donation game with generosity and forgiveness as reported in "Generosity and the Emergence of Forgiveness in the Donation Game" (published in ECAI 2023).
 Note that this is a refactored version of the code to increase readability. Please get in touch if you spot any issues.
 
-The generosity analysis code is in Python, the main simulation is in Java. 
+The generosity analysis code is in Python, the main simulation is in Java (version 19). 
 
 ## Generosity Analysis
 
