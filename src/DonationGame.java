@@ -17,7 +17,7 @@ public class DonationGame {
     double[] rewards; // array for storing the current rewards
     boolean preventNegativePayoffs; // whether to prevent negative rewards
     // NB: Nowak and Sigmund (NS) use the addition of 0.1 to both agents in an interaction to prevent negative payoffs 
-
+    int coop_count;
     protected final static double b = 1; // benefit from receiving a donation
     protected final static double c = 0.1; // cost of donation
 
@@ -37,6 +37,7 @@ public class DonationGame {
         }
         this.imageScores = new double[n][n];
         this.rewards = new double[n];
+        this.coop_count = 0;
     }
 
     public int[] getStrategies() {
@@ -139,6 +140,7 @@ public class DonationGame {
                 rewards[donor] -= c;
                 rewards[recipient] += b;
                 cooperateImageUpdate(donor);
+                coop_count += 1;
             } else {
                 defectImageUpdate(donor);
             }

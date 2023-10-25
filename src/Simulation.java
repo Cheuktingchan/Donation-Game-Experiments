@@ -172,11 +172,13 @@ public class Simulation {
         sb.append("_fr" + (fr ? "True" : "False"));
         sb.append("_g" + generations );
         String fileName = sb.toString();
+        Path coopRatePath = Paths.get(".", dataDir, fileName + "_coop-rate.csv");
         Path allRewardsPath = Paths.get(".", dataDir, fileName + "_all-rewards.csv");
         Path rewardAvPath = Paths.get(".", dataDir, fileName + "_reward-averages.csv");
         Path kAvFreqPath = Paths.get(".", dataDir, fileName + "_kAvFreq.csv");
         Path fAvFreqPath = Paths.get(".", dataDir, fileName + "_fAvFreq.csv");
         if (!quiet) {
+            System.out.println("Output file for cooperation rate: " + coopRatePath);
             System.out.println("Output file for all rewards: " + allRewardsPath);
             System.out.println("Output file for reward averages: " + rewardAvPath);
             System.out.println("Output file for frequency of donation strategies: " + kAvFreqPath);
@@ -244,7 +246,7 @@ public class Simulation {
             game.rouletteWheelSelection();
             game.mutation();
         }
-
+        
         double averageReward = Arrays.stream(rewardAverages).sum() / (double) generations;
         if (!quiet) {
             System.out.println("Average reward: " + averageReward);
@@ -254,6 +256,8 @@ public class Simulation {
         for (int k = 0; k < allRewards.length; k++) {
             Files.writeString(allRewardsPath, Arrays.toString(allRewards[k]).replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         }
+        Files.writeString(coopRatePath, (float) game.coop_count / (m * generations) + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
         Map<Integer,Double> av_k_frequency = new TreeMap<Integer,Double>();
         for (int k = -5; k < 7; k++) {
             if (k_counts.containsKey(k)) {
