@@ -56,6 +56,18 @@ public class DonationGame {
         return Arrays.stream(rewards).average().orElse(Double.NaN);
     }
 
+    public double getRewardVariance() {
+        double mean = getAverageReward();
+        double squaredDifferences = 0;
+
+        for (double value : rewards) {
+            double diff = value - mean;
+            squaredDifferences += diff * diff;
+        }
+
+        return squaredDifferences / rewards.length; // population variance
+    }
+
     private double getImageScore(int maintainer, int target) {
         return imageScores[maintainer][target];
     }
@@ -112,7 +124,7 @@ public class DonationGame {
     }
 
     private void defectImageUpdate(int donor) {
-        if (q < 1.0) {
+        if (q < 1.0) {  
             for (int i = 0; i < n; i++) {
                 if (i != donor && rand.nextDouble() < q) {
                     decrementImage(i, donor);

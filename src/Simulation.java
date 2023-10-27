@@ -173,13 +173,13 @@ public class Simulation {
         sb.append("_g" + generations );
         String fileName = sb.toString();
         Path coopRatePath = Paths.get(".", dataDir, fileName + "_coop-rate.csv");
-        Path allRewardsPath = Paths.get(".", dataDir, fileName + "_all-rewards.csv");
+        Path rewardVarPath = Paths.get(".", dataDir, fileName + "_reward-variances.csv");
         Path rewardAvPath = Paths.get(".", dataDir, fileName + "_reward-averages.csv");
         Path kAvFreqPath = Paths.get(".", dataDir, fileName + "_kAvFreq.csv");
         Path fAvFreqPath = Paths.get(".", dataDir, fileName + "_fAvFreq.csv");
         if (!quiet) {
             System.out.println("Output file for cooperation rate: " + coopRatePath);
-            System.out.println("Output file for all rewards: " + allRewardsPath);
+            System.out.println("Output file for reward averages: " + rewardVarPath);
             System.out.println("Output file for reward averages: " + rewardAvPath);
             System.out.println("Output file for frequency of donation strategies: " + kAvFreqPath);
             System.out.println("Output file for frequency of forgiveness strategies: " + fAvFreqPath);
@@ -207,9 +207,8 @@ public class Simulation {
         }
 
         double[] rewardAverages = new double[generations];
+        double[] varianceRewards = new double[generations];
         
-        double[][] allRewards = new double[generations][n];
-
         Map<Integer,Integer> k_counts = new TreeMap<Integer,Integer>();
 
         // Note, this is only used for forgiveness games
@@ -220,12 +219,7 @@ public class Simulation {
         for (int i = 0; i < generations; i++) {
             game.tick();
             rewardAverages[i] = game.getAverageReward();
-            
-            double[] currentRewards = game.getRewards();
-
-            for (int j = 0; j < currentRewards.length; j ++) {
-                allRewards[i][j] = currentRewards[j];
-            }
+            varianceRewards[i] = game.getRewardVariance();
 
             for (int k : game.strategies) {
                 if (k_counts.containsKey(k)) {
@@ -253,9 +247,12 @@ public class Simulation {
         }
         Files.writeString(rewardAvPath, averageReward + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         
-        for (int k = 0; k < allRewards.length; k++) {
-            Files.writeString(allRewardsPath, Arrays.toString(allRewards[k]).replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        double rewardVariance = Arrays.stream(varianceRewards).sum() / (double) generations;
+        if (!quiet) {
+            System.out.println("Reward variance: " + rewardVariance);
         }
+        Files.writeString(rewardVarPath, rewardVariance + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        
         Files.writeString(coopRatePath, (float) game.coop_count / (m * generations) + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 
         Map<Integer,Double> av_k_frequency = new TreeMap<Integer,Double>();
