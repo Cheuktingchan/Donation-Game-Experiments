@@ -11,8 +11,8 @@ public class NoisyDonationGame extends DonationGame {
     double ep;
 
     public NoisyDonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, 
-        double ea, double ep) {        
-            super(n, m, q, mr, preventNegativePayoffs);
+        double ea, double ep, int network) {        
+            super(n, m, q, mr, preventNegativePayoffs, network);
             this.ea = ea;
             this.ep = ep;
         }

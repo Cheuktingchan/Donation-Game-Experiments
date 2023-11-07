@@ -17,7 +17,8 @@ public class DonationGame {
     double[] rewards; // array for storing the current rewards
     boolean preventNegativePayoffs; // whether to prevent negative rewards
     // NB: Nowak and Sigmund (NS) use the addition of 0.1 to both agents in an interaction to prevent negative payoffs 
-    int coop_count;
+    int coop_count; // number of donations used to calculate cooperation rate
+    int network; // 0 = Fully Connected, 1 = Bipartite
     protected final static double b = 1; // benefit from receiving a donation
     protected final static double c = 0.1; // cost of donation
 
@@ -25,11 +26,12 @@ public class DonationGame {
     protected static final DecimalFormat df = new DecimalFormat("0.00");
 
 
-    public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs) {        
+    public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, int network) {        
         this.n = n;
         this.m = m;
         this.q = q;
         this.mr = mr;
+        this.network = network;
         this.preventNegativePayoffs = preventNegativePayoffs;
         this.strategies = new int[n];
         for (int i = 0; i < strategies.length; i++) {
@@ -144,7 +146,9 @@ public class DonationGame {
         for (int i = 0; i < m; i++) {
             int donor = rand.nextInt(n);
             int recipient = rand.nextInt(n);
-            while (recipient == donor) {
+            while (recipient == donor ||
+                network == 1 && ((recipient % 2) == (donor % 2)) // bipartite condition
+                ) {
                 recipient = rand.nextInt(n);
             }
             double imageScore = getImageScore(donor, recipient);
@@ -221,7 +225,7 @@ public class DonationGame {
 
     // simple main method to test things are working with toy instantiation 
     public static void main(String[] args) throws Exception {
-        DonationGame game = new DonationGame(10, 30, 1.0, 0.001, false);
+        DonationGame game = new DonationGame(10, 30, 1.0, 0.001, false, 0);
         int generations = 10;
         for (int i = 0; i < generations; i++) {
             System.out.println("g " + i);

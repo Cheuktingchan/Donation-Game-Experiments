@@ -39,6 +39,7 @@ public class Simulation {
         options.addOption(new Option("fa", "forgiveness_action", false, "Enable action forgiveness"));
         options.addOption(new Option("fr", "forgiveness_reputation", false, "Enable reputation (assessment) forgiveness"));
         options.addOption(new Option("g", "generations", true, "Generations to run simulation for"));
+        options.addOption(new Option("net", "network", true, "0 = Fully Connected, 1 = Bipartite"));
         options.addOption(new Option("quiet", false, "Run with minimal output"));
         CommandLineParser parser = new DefaultParser(false);
         CommandLine cmd = parser.parse(options, args);
@@ -58,10 +59,16 @@ public class Simulation {
         boolean fr;
         int generations;
         boolean quiet;
+        int network;
         if (cmd.hasOption("h")) {
             formatter.printHelp("Simulation", options);
             System.out.println();
             System.exit(0);
+        }
+        if(cmd.hasOption("net")) {
+            network = Integer.parseInt(cmd.getOptionValue("net"));
+        } else {
+            network = 0;
         }
         if(cmd.hasOption("n")) {
             n = Integer.parseInt(cmd.getOptionValue("n"));
@@ -151,7 +158,8 @@ public class Simulation {
             + " ns=" + preventNegativePayoffs
             + " generosity=" + generosity + " g1=" + g1 + " g2=" + g2
             + " fa=" + fa + " fr=" + fr  
-            + " generations=" + generations);
+            + " generations=" + generations
+            + " network=" + network);
         }
 
         String dataDir = "data";
@@ -171,24 +179,27 @@ public class Simulation {
         sb.append("_fa" + (fa ? "True" : "False"));
         sb.append("_fr" + (fr ? "True" : "False"));
         sb.append("_g" + generations );
+        sb.append("_net" + network );
         String fileName = sb.toString();
         Path coopRatePath = Paths.get(".", dataDir, fileName + "_coop-rate.csv");
         Path rewardVarPath = Paths.get(".", dataDir, fileName + "_reward-variances.csv");
         Path rewardAvPath = Paths.get(".", dataDir, fileName + "_reward-averages.csv");
         Path kAvFreqPath = Paths.get(".", dataDir, fileName + "_kAvFreq.csv");
+        Path kFinFreqPath = Paths.get(".", dataDir, fileName + "_kFinFreq.csv");
         Path fAvFreqPath = Paths.get(".", dataDir, fileName + "_fAvFreq.csv");
         if (!quiet) {
             System.out.println("Output file for cooperation rate: " + coopRatePath);
             System.out.println("Output file for reward averages: " + rewardVarPath);
             System.out.println("Output file for reward averages: " + rewardAvPath);
-            System.out.println("Output file for frequency of donation strategies: " + kAvFreqPath);
+            System.out.println("Output file for average frequency of donation strategies: " + kAvFreqPath);
+            System.out.println("Output file for final frequency of donation strategies: " + kFinFreqPath);
             System.out.println("Output file for frequency of forgiveness strategies: " + fAvFreqPath);
         }
 
         DonationGame game;
         if (!generosity && !fa && !fr && ea == 0.0 && ep == 0.0) {
             System.out.println("Using DonationGame, i.e., without noise, generosity or forgiveness");
-            game = new DonationGame(n, m, q, mr, preventNegativePayoffs);
+            game = new DonationGame(n, m, q, mr, preventNegativePayoffs, network);
         } else {
             if (generosity && (g1 > 0.0 || g2 > 0.0)) {
                 if (fa || fr) {
@@ -196,13 +207,13 @@ public class Simulation {
                     System.exit(1);
                 }
                 System.out.println("Using GenerosityDonationGame, i.e., with noise and generosity");
-                game = new GenerosityDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, g1, g2);
+                game = new GenerosityDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, g1, g2, network);
             } else if (fa || fr) {
                 System.out.println("Using ForgivenessDonationGame, i.e., with noise and forgiveness");
-                game = new ForgivenessDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, fa, fr);                
+                game = new ForgivenessDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, fa, fr, network);                
             } else {
                 System.out.println("Using NoisyDonationGame, i.e., with noise");
-                game = new NoisyDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep);
+                game = new NoisyDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, network);
             }
         }
 
@@ -210,6 +221,7 @@ public class Simulation {
         double[] varianceRewards = new double[generations];
         
         Map<Integer,Integer> k_counts = new TreeMap<Integer,Integer>();
+        Map<Integer,Integer> k_counts_final = new TreeMap<Integer,Integer>();
 
         // Note, this is only used for forgiveness games
         // This is an inefficient hack to inspect forgiveness strategy frequencies, and
@@ -241,6 +253,14 @@ public class Simulation {
             game.mutation();
         }
         
+        for (int k : game.strategies) {
+            if (k_counts_final.containsKey(k)) {
+                k_counts_final.put(k, k_counts_final.get(k) + 1);
+            } else {
+                k_counts_final.put(k, 1);
+            }
+        }
+
         double averageReward = Arrays.stream(rewardAverages).sum() / (double) generations;
         if (!quiet) {
             System.out.println("Average reward: " + averageReward);
@@ -254,7 +274,9 @@ public class Simulation {
         Files.writeString(rewardVarPath, rewardVariance + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         
         Files.writeString(coopRatePath, (float) game.coop_count / (m * generations) + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-
+        if (!quiet) {
+            System.out.println("Cooperation rate: " + (float) game.coop_count / (m * generations));
+        }
         Map<Integer,Double> av_k_frequency = new TreeMap<Integer,Double>();
         for (int k = -5; k < 7; k++) {
             if (k_counts.containsKey(k)) {
@@ -267,6 +289,19 @@ public class Simulation {
             System.out.println("Average k frequencies:" + av_k_frequency);
         }
         Files.writeString(kAvFreqPath, av_k_frequency.values().toString().replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        
+        Map<Integer,Double> fin_k_frequency = new TreeMap<Integer,Double>();
+        for (int k = -5; k < 7; k++) {
+            if (k_counts_final.containsKey(k)) {
+                fin_k_frequency.put(k, ((double) k_counts_final.get(k)) / n);
+            } else {
+                fin_k_frequency.put(k, 0.0);
+            }
+        }
+        if (!quiet) {
+            System.out.println("Final k frequencies:" + fin_k_frequency);
+        }
+        Files.writeString(kFinFreqPath, fin_k_frequency.values().toString().replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 
         if (game instanceof ForgivenessDonationGame) {
             Map<Double,Double> av_f_frequency = new TreeMap<Double,Double>();
