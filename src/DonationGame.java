@@ -147,8 +147,7 @@ public class DonationGame {
             int donor = rand.nextInt(n);
             int recipient = rand.nextInt(n);
             while (recipient == donor ||
-                network == 1 && ((recipient % 2) == (donor % 2)) // bipartite condition
-                ) {
+                network == 1 && ((recipient / 2) < n/2 && (donor / 2) < n/2)) { // bipartite condition
                 recipient = rand.nextInt(n);
             }
             double imageScore = getImageScore(donor, recipient);

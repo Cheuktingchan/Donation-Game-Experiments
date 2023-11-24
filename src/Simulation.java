@@ -189,7 +189,7 @@ public class Simulation {
         Path fAvFreqPath = Paths.get(".", dataDir, fileName + "_fAvFreq.csv");
         if (!quiet) {
             System.out.println("Output file for cooperation rate: " + coopRatePath);
-            System.out.println("Output file for reward averages: " + rewardVarPath);
+            System.out.println("Output file for reward variance: " + rewardVarPath);
             System.out.println("Output file for reward averages: " + rewardAvPath);
             System.out.println("Output file for average frequency of donation strategies: " + kAvFreqPath);
             System.out.println("Output file for final frequency of donation strategies: " + kFinFreqPath);
