@@ -40,6 +40,7 @@ public class Simulation {
         options.addOption(new Option("fr", "forgiveness_reputation", false, "Enable reputation (assessment) forgiveness"));
         options.addOption(new Option("g", "generations", true, "Generations to run simulation for"));
         options.addOption(new Option("net", "network", true, "0 = Fully Connected, 1 = Bipartite"));
+        options.addOption(new Option("endN", false, "End generations when a single k norm reached"));
         options.addOption(new Option("quiet", false, "Run with minimal output"));
         CommandLineParser parser = new DefaultParser(false);
         CommandLine cmd = parser.parse(options, args);
@@ -60,10 +61,16 @@ public class Simulation {
         int generations;
         boolean quiet;
         int network;
+        boolean endN; // whether endN mode is on
         if (cmd.hasOption("h")) {
             formatter.printHelp("Simulation", options);
             System.out.println();
             System.exit(0);
+        }
+        if(cmd.hasOption("endN")) {
+            endN = true;
+        } else {
+            endN = false;
         }
         if(cmd.hasOption("net")) {
             network = Integer.parseInt(cmd.getOptionValue("net"));
@@ -180,6 +187,7 @@ public class Simulation {
         sb.append("_fr" + (fr ? "True" : "False"));
         sb.append("_g" + generations );
         sb.append("_net" + network );
+        sb.append("_endN" + (endN ? "True" : "False") );
         String fileName = sb.toString();
         Path coopRatePath = Paths.get(".", dataDir, fileName + "_coop-rate.csv");
         Path rewardVarPath = Paths.get(".", dataDir, fileName + "_reward-variances.csv");
@@ -230,6 +238,16 @@ public class Simulation {
 
         for (int i = 0; i < generations; i++) {
             game.tick();
+            if (endN){
+                int kEmerged = game.getSingleKNormEmerged(generations);
+                if (kEmerged != -100){
+                    System.out.println("Result: Norm " + kEmerged + " emerged in " + i + " generations");
+                    Path singleNormPath = Paths.get(".", dataDir, fileName + "_single-norm.csv");
+                    int[] singleNormResult = {kEmerged, i}; // k norm, generations taken
+                    Files.writeString(singleNormPath, Arrays.toString(singleNormResult).replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                    break;
+                }
+            }
             rewardAverages[i] = game.getAverageReward();
             varianceRewards[i] = game.getRewardVariance();
 
@@ -240,6 +258,7 @@ public class Simulation {
                     k_counts.put(k, 1);
                 }
             }
+
             if (game instanceof ForgivenessDonationGame) {
                 for (double f : ((ForgivenessDonationGame) game).forgivenessStrategies) {
                     if (f_counts.containsKey(f)) {

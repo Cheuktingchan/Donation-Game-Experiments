@@ -15,7 +15,7 @@ def average_columns(csv_file):
         return header, averages
 
 def main():
-    parser = argparse.ArgumentParser(description='Calculate column averages from a CSV file.')
+    parser = argparse.ArgumentParser(description='Calculate column averages')
     parser.add_argument('csv_file', help='Path to the CSV file')
 
     args = parser.parse_args()
@@ -23,7 +23,6 @@ def main():
 
     header, averages = average_columns(csv_file)
 
-    # Print the results
     print("Column names:", header)
     print("Averages:", averages)
 

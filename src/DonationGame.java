@@ -18,6 +18,7 @@ public class DonationGame {
     boolean preventNegativePayoffs; // whether to prevent negative rewards
     // NB: Nowak and Sigmund (NS) use the addition of 0.1 to both agents in an interaction to prevent negative payoffs 
     int coop_count; // number of donations used to calculate cooperation rate
+    int numConsecK; // number of consecutive generations that have reached a norm of K
     int network; // 0 = Fully Connected, 1 = Bipartite
     protected final static double b = 1; // benefit from receiving a donation
     protected final static double c = 0.1; // cost of donation
@@ -147,7 +148,7 @@ public class DonationGame {
             int donor = rand.nextInt(n);
             int recipient = rand.nextInt(n);
             while (recipient == donor ||
-                network == 1 && ((recipient / 2) < n/2 && (donor / 2) < n/2)) { // bipartite condition
+                network == 1 && (recipient < n/2 && donor < n/2)) { // bipartite condition
                 recipient = rand.nextInt(n);
             }
             double imageScore = getImageScore(donor, recipient);
@@ -220,6 +221,32 @@ public class DonationGame {
         strategies = newStrategies;
         Arrays.fill(rewards, 0.0);
         Arrays.stream(imageScores).forEach(a -> Arrays.fill(a, 0));
+    }
+
+    public int getSingleKNormEmerged (int generations) { // -100 means no norm, -5 to 6 means k is a norm
+        int norm = -100;
+        int[] stratCounts = new int[12];
+        for (int i = 0; i < 12; i++) {
+            stratCounts[i] = 0;
+        }
+        for (int i = 0; i < n; i++) {
+            stratCounts[strategies[i] + 5] += 1;
+        }
+        for (int i = 0; i < 12; i++) {
+            if (stratCounts[i] > 0.98 * n){
+                norm = i - 5;
+                numConsecK += 1;
+                break;
+            }
+        }
+        if (norm == -100) {
+            numConsecK = 0;
+        }
+
+        if (numConsecK > 100){
+            return norm;
+        }
+        return -100;
     }
 
     // simple main method to test things are working with toy instantiation 
