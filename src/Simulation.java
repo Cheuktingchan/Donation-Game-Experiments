@@ -192,6 +192,7 @@ public class Simulation {
         Path coopRatePath = Paths.get(".", dataDir, fileName + "_coop-rate.csv");
         Path rewardVarPath = Paths.get(".", dataDir, fileName + "_reward-variances.csv");
         Path rewardAvPath = Paths.get(".", dataDir, fileName + "_reward-averages.csv");
+        Path rewardFinPath = Paths.get(".", dataDir, fileName + "_reward-final.csv");
         Path kAvFreqPath = Paths.get(".", dataDir, fileName + "_kAvFreq.csv");
         Path kFinFreqPath = Paths.get(".", dataDir, fileName + "_kFinFreq.csv");
         Path fAvFreqPath = Paths.get(".", dataDir, fileName + "_fAvFreq.csv");
@@ -199,6 +200,7 @@ public class Simulation {
             System.out.println("Output file for cooperation rate: " + coopRatePath);
             System.out.println("Output file for reward variance: " + rewardVarPath);
             System.out.println("Output file for reward averages: " + rewardAvPath);
+            System.out.println("Output file for final averages: " + rewardFinPath);
             System.out.println("Output file for average frequency of donation strategies: " + kAvFreqPath);
             System.out.println("Output file for final frequency of donation strategies: " + kFinFreqPath);
             System.out.println("Output file for frequency of forgiveness strategies: " + fAvFreqPath);
@@ -281,11 +283,17 @@ public class Simulation {
         }
 
         double averageReward = Arrays.stream(rewardAverages).sum() / (double) generations;
+        double finReward = rewardAverages[generations-1];
         if (!quiet) {
             System.out.println("Average reward: " + averageReward);
         }
         Files.writeString(rewardAvPath, averageReward + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         
+        if (!quiet) {
+            System.out.println("Final reward: " + finReward);
+        }
+        Files.writeString(rewardFinPath, finReward + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
         double rewardVariance = Arrays.stream(varianceRewards).sum() / (double) generations;
         if (!quiet) {
             System.out.println("Reward variance: " + rewardVariance);
