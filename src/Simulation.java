@@ -2,7 +2,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.DoubleStream;
@@ -41,6 +44,7 @@ public class Simulation {
         options.addOption(new Option("g", "generations", true, "Generations to run simulation for"));
         options.addOption(new Option("net", "network", true, "0 = Fully Connected, 1 = Bipartite"));
         options.addOption(new Option("endN", false, "End generations when a single k norm reached"));
+        options.addOption(new Option("outPart", true, "Partition indices for output data"));
         options.addOption(new Option("quiet", false, "Run with minimal output"));
         CommandLineParser parser = new DefaultParser(false);
         CommandLine cmd = parser.parse(options, args);
@@ -62,6 +66,7 @@ public class Simulation {
         boolean quiet;
         int network;
         boolean endN; // whether endN mode is on
+        int[][] outPartShape;
         if (cmd.hasOption("h")) {
             formatter.printHelp("Simulation", options);
             System.out.println();
@@ -81,6 +86,15 @@ public class Simulation {
             n = Integer.parseInt(cmd.getOptionValue("n"));
         } else {
             n = 100;
+        }
+        if(cmd.hasOption("outPart")) {
+            String[] outPartStrs = cmd.getOptionValues("outPart");
+            outPartShape = new int[outPartStrs.length][];
+            for(int i = 0; i < outPartStrs.length; i++) {
+                outPartShape[i] = new int[Integer.parseInt(outPartStrs[i])];
+            }
+        } else {
+            outPartShape = new int[1][n];
         }
         if(cmd.hasOption("m")) {
             m = Integer.parseInt(cmd.getOptionValue("m"));
@@ -189,6 +203,22 @@ public class Simulation {
         sb.append("_net" + network );
         sb.append("_endN" + (endN ? "True" : "False") );
         String fileName = sb.toString();
+        // output paths:
+        List<Map<String, Path>> outPartPaths = new ArrayList<>();
+        int cumInd = 0;
+        for (int i = 0; i < outPartShape.length; i++){
+            cumInd += outPartShape[i].length;
+            String curPart = (cumInd-outPartShape[i].length) + "-" + cumInd;
+            Map<String, Path> pathMap = new HashMap<>();
+            pathMap.put("coopRate", Paths.get(".", dataDir, fileName + "_coop-rate" + curPart + ".csv"));
+            pathMap.put("rewardVar", Paths.get(".", dataDir, fileName + "_reward-variances" + curPart + ".csv"));
+            pathMap.put("rewardAv", Paths.get(".", dataDir, fileName + "_reward-averages" + curPart + ".csv"));
+            pathMap.put("rewardFin", Paths.get(".", dataDir, fileName + "_reward-final" + curPart + ".csv"));
+            pathMap.put("kAvFreq", Paths.get(".", dataDir, fileName + "_kAvFreq" + curPart + ".csv"));
+            pathMap.put("kFinFreq", Paths.get(".", dataDir, fileName + "_kFinFreq" + curPart + ".csv"));
+            pathMap.put("fAvFreq", Paths.get(".", dataDir, fileName + "_fAvFreq" + curPart + ".csv"));
+            outPartPaths.add(pathMap);
+        }
         Path coopRatePath = Paths.get(".", dataDir, fileName + "_coop-rate.csv");
         Path rewardVarPath = Paths.get(".", dataDir, fileName + "_reward-variances.csv");
         Path rewardAvPath = Paths.get(".", dataDir, fileName + "_reward-averages.csv");
