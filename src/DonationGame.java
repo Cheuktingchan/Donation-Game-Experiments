@@ -17,9 +17,10 @@ public class DonationGame {
     double[] rewards; // array for storing the current rewards
     boolean preventNegativePayoffs; // whether to prevent negative rewards
     // NB: Nowak and Sigmund (NS) use the addition of 0.1 to both agents in an interaction to prevent negative payoffs 
-    int coop_count; // number of donations used to calculate cooperation rate
+    int[] coop_count; // number of donations used to calculate cooperation rate
     int numConsecK; // number of consecutive generations that have reached a norm of K
     int network; // 0 = Fully Connected, 1 = Bipartite
+    int[][] outPartShape;
     protected final static double b = 1; // benefit from receiving a donation
     protected final static double c = 0.1; // cost of donation
 
@@ -27,7 +28,7 @@ public class DonationGame {
     protected static final DecimalFormat df = new DecimalFormat("0.00");
 
 
-    public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, int network) {        
+    public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, int network, int[][] outPartShape) {        
         this.n = n;
         this.m = m;
         this.q = q;
@@ -40,7 +41,8 @@ public class DonationGame {
         }
         this.imageScores = new double[n][n];
         this.rewards = new double[n];
-        this.coop_count = 0;
+        this.outPartShape = outPartShape;
+        this.coop_count = new int [outPartShape.length];
     }
 
     public int[] getStrategies() {
@@ -156,7 +158,13 @@ public class DonationGame {
                 rewards[donor] -= c;
                 rewards[recipient] += b;
                 cooperateImageUpdate(donor);
-                coop_count += 1;
+                int cumInd = 0;
+                for (int j = 0; j < outPartShape.length; j++){
+                    cumInd += outPartShape[j].length;
+                    if (cumInd - outPartShape[j].length <= donor && donor < cumInd ){
+                        coop_count[j] += 1;
+                    }
+                }
             } else {
                 defectImageUpdate(donor);
             }
@@ -251,7 +259,7 @@ public class DonationGame {
 
     // simple main method to test things are working with toy instantiation 
     public static void main(String[] args) throws Exception {
-        DonationGame game = new DonationGame(10, 30, 1.0, 0.001, false, 0);
+        DonationGame game = new DonationGame(10, 30, 1.0, 0.001, false, 0, new int[1][]);
         int generations = 10;
         for (int i = 0; i < generations; i++) {
             System.out.println("g " + i);

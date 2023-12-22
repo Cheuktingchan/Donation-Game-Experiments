@@ -8,8 +8,8 @@ public class GenerosityDonationGame extends NoisyDonationGame {
     double g2;
 
     public GenerosityDonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, 
-        double ea, double ep, double g1, double g2, int network) {
-            super(n, m, q, mr, preventNegativePayoffs, ea, ep, network);
+        double ea, double ep, double g1, double g2, int network, int[][] outPartShape) {
+            super(n, m, q, mr, preventNegativePayoffs, ea, ep, network, outPartShape);
             this.g1 = g1;
             this.g2 = g2;
         }       

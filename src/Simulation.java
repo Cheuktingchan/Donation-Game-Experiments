@@ -44,7 +44,11 @@ public class Simulation {
         options.addOption(new Option("g", "generations", true, "Generations to run simulation for"));
         options.addOption(new Option("net", "network", true, "0 = Fully Connected, 1 = Bipartite"));
         options.addOption(new Option("endN", false, "End generations when a single k norm reached"));
-        options.addOption(new Option("outPart", true, "Partition indices for output data"));
+        Option outPartOption = Option.builder("outPart")
+            .hasArgs()
+            .desc("Partition indices for output data")
+            .build();
+        options.addOption(outPartOption);
         options.addOption(new Option("quiet", false, "Run with minimal output"));
         CommandLineParser parser = new DefaultParser(false);
         CommandLine cmd = parser.parse(options, args);
@@ -90,7 +94,10 @@ public class Simulation {
         if(cmd.hasOption("outPart")) {
             String[] outPartStrs = cmd.getOptionValues("outPart");
             outPartShape = new int[outPartStrs.length][];
+            System.out.print("partstr");
+            System.out.print(outPartStrs.length);
             for(int i = 0; i < outPartStrs.length; i++) {
+                System.out.print(outPartStrs[i]);
                 outPartShape[i] = new int[Integer.parseInt(outPartStrs[i])];
             }
         } else {
@@ -239,7 +246,7 @@ public class Simulation {
         DonationGame game;
         if (!generosity && !fa && !fr && ea == 0.0 && ep == 0.0) {
             System.out.println("Using DonationGame, i.e., without noise, generosity or forgiveness");
-            game = new DonationGame(n, m, q, mr, preventNegativePayoffs, network);
+            game = new DonationGame(n, m, q, mr, preventNegativePayoffs, network, outPartShape);
         } else {
             if (generosity && (g1 > 0.0 || g2 > 0.0)) {
                 if (fa || fr) {
@@ -247,20 +254,33 @@ public class Simulation {
                     System.exit(1);
                 }
                 System.out.println("Using GenerosityDonationGame, i.e., with noise and generosity");
-                game = new GenerosityDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, g1, g2, network);
+                game = new GenerosityDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, g1, g2, network, outPartShape);
             } else if (fa || fr) {
                 System.out.println("Using ForgivenessDonationGame, i.e., with noise and forgiveness");
-                game = new ForgivenessDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, fa, fr, network);                
+                game = new ForgivenessDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, fa, fr, network, outPartShape);                
             } else {
                 System.out.println("Using NoisyDonationGame, i.e., with noise");
-                game = new NoisyDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, network);
+                game = new NoisyDonationGame(n, m, q, mr, preventNegativePayoffs, ea, ep, network, outPartShape);
             }
         }
 
         double[] rewardAverages = new double[generations];
         double[] varianceRewards = new double[generations];
-        
-        Map<Integer,Integer> k_counts = new TreeMap<Integer,Integer>();
+        ArrayList<TreeMap<Integer,Integer>> k_counts = new ArrayList<TreeMap<Integer,Integer>>();
+        cumInd = 0;
+        for (int i = 0; i < outPartShape.length; i++){
+            cumInd += outPartShape[i].length;
+            TreeMap<Integer,Integer> cur_counts = new TreeMap<>();
+            for (int k : Arrays.copyOfRange(game.strategies, (cumInd-outPartShape[i].length), cumInd)) {
+                if (cur_counts.containsKey(k)) {
+                    cur_counts.put(k, cur_counts.get(k) + 1);
+                } else {
+                    cur_counts.put(k, 1);
+                }
+            }
+            k_counts.add(cur_counts);
+        }
+        //Map<Integer,Integer> k_counts = new TreeMap<Integer,Integer>();
         Map<Integer,Integer> k_counts_final = new TreeMap<Integer,Integer>();
 
         // Note, this is only used for forgiveness games
@@ -282,12 +302,16 @@ public class Simulation {
             }
             rewardAverages[i] = game.getAverageReward();
             varianceRewards[i] = game.getRewardVariance();
-
-            for (int k : game.strategies) {
-                if (k_counts.containsKey(k)) {
-                    k_counts.put(k, k_counts.get(k) + 1);
-                } else {
-                    k_counts.put(k, 1);
+            
+            cumInd = 0;
+            for (int j = 0; j < outPartShape.length; j++){
+                cumInd += outPartShape[j].length;
+                for (int k : Arrays.copyOfRange(game.strategies, (cumInd-outPartShape[j].length), cumInd)) {
+                    if (k_counts.get(j).containsKey(k)) {
+                        k_counts.get(j).put(k, k_counts.get(j).get(k) + 1);
+                    } else {
+                        k_counts.get(j).put(k, 1);
+                    }
                 }
             }
 
@@ -330,23 +354,29 @@ public class Simulation {
         }
         Files.writeString(rewardVarPath, rewardVariance + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         
-        Files.writeString(coopRatePath, (float) game.coop_count / (m * generations) + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        if (!quiet) {
-            System.out.println("Cooperation rate: " + (float) game.coop_count / (m * generations));
-        }
-        Map<Integer,Double> av_k_frequency = new TreeMap<Integer,Double>();
-        for (int k = -5; k < 7; k++) {
-            if (k_counts.containsKey(k)) {
-                av_k_frequency.put(k, ((double) k_counts.get(k)) / (n * generations));
-            } else {
-                av_k_frequency.put(k, 0.0);
+        System.out.println(outPartShape.length);
+        for (int i = 0; i < outPartShape.length; i++){
+            Files.writeString(outPartPaths.get(i).get("coopRate"), (float) game.coop_count[i] / (m * generations) + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            if (!quiet) {
+                System.out.println("Cooperation rate " + i + ": " + (float) game.coop_count[i] / (m * generations));
             }
         }
-        if (!quiet) {
-            System.out.println("Average k frequencies:" + av_k_frequency);
+        ArrayList<TreeMap<Integer,Double>> av_k_frequency = new ArrayList<TreeMap<Integer,Double>>();
+        for (int i = 0; i < outPartShape.length; i++){
+            TreeMap<Integer,Double> cur_av_frequency = new TreeMap<Integer,Double>();
+            for (int k = -5; k < 7; k++) {
+                if (k_counts.get(i).containsKey(k)) {
+                    cur_av_frequency.put(k, ((double) k_counts.get(i).get(k)) / (n * generations));
+                } else {
+                    cur_av_frequency.put(k, 0.0);
+                }
+            }
+            av_k_frequency.add(cur_av_frequency);
+            if (!quiet) {
+                System.out.println("Average k frequencies:" + av_k_frequency.get(i));
+            }
+            Files.writeString(outPartPaths.get(i).get("kAvFreq"), av_k_frequency.get(i).values().toString().replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         }
-        Files.writeString(kAvFreqPath, av_k_frequency.values().toString().replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        
         Map<Integer,Double> fin_k_frequency = new TreeMap<Integer,Double>();
         for (int k = -5; k < 7; k++) {
             if (k_counts_final.containsKey(k)) {
