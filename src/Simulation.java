@@ -264,13 +264,13 @@ public class Simulation {
             }
         }
 
-        double[] rewardAverages = new double[generations];
-        double[] varianceRewards = new double[generations];
+        double[][] rewardAverages = new double [outPartShape.length][generations];
+        double[][] varianceRewards = new double [outPartShape.length][generations];
         ArrayList<TreeMap<Integer,Integer>> k_counts = new ArrayList<TreeMap<Integer,Integer>>();
         cumInd = 0;
         for (int i = 0; i < outPartShape.length; i++){
             cumInd += outPartShape[i].length;
-            TreeMap<Integer,Integer> cur_counts = new TreeMap<>();
+            TreeMap<Integer,Integer> cur_counts = new TreeMap<Integer,Integer>();
             for (int k : Arrays.copyOfRange(game.strategies, (cumInd-outPartShape[i].length), cumInd)) {
                 if (cur_counts.containsKey(k)) {
                     cur_counts.put(k, cur_counts.get(k) + 1);
@@ -280,8 +280,8 @@ public class Simulation {
             }
             k_counts.add(cur_counts);
         }
-        //Map<Integer,Integer> k_counts = new TreeMap<Integer,Integer>();
-        Map<Integer,Integer> k_counts_final = new TreeMap<Integer,Integer>();
+
+        ArrayList<TreeMap<Integer,Integer>> k_counts_final = new ArrayList<TreeMap<Integer,Integer>>();
 
         // Note, this is only used for forgiveness games
         // This is an inefficient hack to inspect forgiveness strategy frequencies, and
@@ -300,12 +300,15 @@ public class Simulation {
                     break;
                 }
             }
-            rewardAverages[i] = game.getAverageReward();
-            varianceRewards[i] = game.getRewardVariance();
             
             cumInd = 0;
             for (int j = 0; j < outPartShape.length; j++){
                 cumInd += outPartShape[j].length;
+                
+                // reward outputs for each partition
+                rewardAverages[j][i] = game.getAverageReward((cumInd-outPartShape[j].length), cumInd);
+                varianceRewards[j][i] = game.getRewardVariance((cumInd-outPartShape[j].length), cumInd);
+
                 for (int k : Arrays.copyOfRange(game.strategies, (cumInd-outPartShape[j].length), cumInd)) {
                     if (k_counts.get(j).containsKey(k)) {
                         k_counts.get(j).put(k, k_counts.get(j).get(k) + 1);
@@ -328,37 +331,42 @@ public class Simulation {
             game.mutation();
         }
         
-        for (int k : game.strategies) {
-            if (k_counts_final.containsKey(k)) {
-                k_counts_final.put(k, k_counts_final.get(k) + 1);
-            } else {
-                k_counts_final.put(k, 1);
-            }
-        }
-
-        double averageReward = Arrays.stream(rewardAverages).sum() / (double) generations;
-        double finReward = rewardAverages[generations-1];
-        if (!quiet) {
-            System.out.println("Average reward: " + averageReward);
-        }
-        Files.writeString(rewardAvPath, averageReward + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        
-        if (!quiet) {
-            System.out.println("Final reward: " + finReward);
-        }
-        Files.writeString(rewardFinPath, finReward + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-
-        double rewardVariance = Arrays.stream(varianceRewards).sum() / (double) generations;
-        if (!quiet) {
-            System.out.println("Reward variance: " + rewardVariance);
-        }
-        Files.writeString(rewardVarPath, rewardVariance + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        
-        System.out.println(outPartShape.length);
+        cumInd = 0;
         for (int i = 0; i < outPartShape.length; i++){
-            Files.writeString(outPartPaths.get(i).get("coopRate"), (float) game.coop_count[i] / (m * generations) + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            cumInd += outPartShape[i].length;
+            TreeMap<Integer,Integer> cur_counts = new TreeMap<Integer,Integer>();
+            for (int k : Arrays.copyOfRange(game.strategies, (cumInd-outPartShape[i].length), cumInd)) {
+                if (cur_counts.containsKey(k)) {
+                    cur_counts.put(k, cur_counts.get(k) + 1);
+                } else {
+                    cur_counts.put(k, 1);
+                }
+            }
+            k_counts_final.add(cur_counts);
+        }
+        
+        for (int i = 0; i < outPartShape.length; i++){
+            double averageReward = Arrays.stream(rewardAverages[i]).sum() / (double) generations;
+            double finReward = rewardAverages[i][generations-1];
             if (!quiet) {
-                System.out.println("Cooperation rate " + i + ": " + (float) game.coop_count[i] / (m * generations));
+                System.out.println("Average reward: "  + i + ": " + averageReward);
+            }
+            Files.writeString(outPartPaths.get(i).get("rewardAv"), averageReward + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            
+            if (!quiet) {
+                System.out.println("Final reward: "  + i + ": " + finReward);
+            }
+            Files.writeString(outPartPaths.get(i).get("rewardFin"), finReward + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
+            double rewardVariance = Arrays.stream(varianceRewards[i]).sum() / (double) generations;
+            if (!quiet) {
+                System.out.println("Reward variance: "  + i + ": " + rewardVariance);
+            }
+            Files.writeString(outPartPaths.get(i).get("rewardVar"), rewardVariance + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+
+            Files.writeString(outPartPaths.get(i).get("coopRate"), (float) game.coop_count[i] / game.act_count[i] + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            if (!quiet) {
+                System.out.println("Cooperation rate " + i + ": " + (float) game.coop_count[i] / game.act_count[i]);
             }
         }
         ArrayList<TreeMap<Integer,Double>> av_k_frequency = new ArrayList<TreeMap<Integer,Double>>();
@@ -366,29 +374,34 @@ public class Simulation {
             TreeMap<Integer,Double> cur_av_frequency = new TreeMap<Integer,Double>();
             for (int k = -5; k < 7; k++) {
                 if (k_counts.get(i).containsKey(k)) {
-                    cur_av_frequency.put(k, ((double) k_counts.get(i).get(k)) / (n * generations));
+                    cur_av_frequency.put(k, ((double) k_counts.get(i).get(k)) / (outPartShape[i].length * generations));
                 } else {
                     cur_av_frequency.put(k, 0.0);
                 }
             }
             av_k_frequency.add(cur_av_frequency);
             if (!quiet) {
-                System.out.println("Average k frequencies:" + av_k_frequency.get(i));
+                System.out.println("Average k frequencies " + i + ": " + av_k_frequency.get(i));
             }
             Files.writeString(outPartPaths.get(i).get("kAvFreq"), av_k_frequency.get(i).values().toString().replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         }
-        Map<Integer,Double> fin_k_frequency = new TreeMap<Integer,Double>();
-        for (int k = -5; k < 7; k++) {
-            if (k_counts_final.containsKey(k)) {
-                fin_k_frequency.put(k, ((double) k_counts_final.get(k)) / n);
-            } else {
-                fin_k_frequency.put(k, 0.0);
+
+        ArrayList<TreeMap<Integer,Double>> fin_k_frequency = new ArrayList<TreeMap<Integer,Double>>();
+        for (int i = 0; i < outPartShape.length; i++){
+            TreeMap<Integer,Double> cur_av_frequency = new TreeMap<Integer,Double>();
+            for (int k = -5; k < 7; k++) {
+                if (k_counts_final.get(i).containsKey(k)) {
+                    cur_av_frequency.put(k, ((double) k_counts_final.get(i).get(k)) / outPartShape[i].length);
+                } else {
+                    cur_av_frequency.put(k, 0.0);
+                }
             }
+            fin_k_frequency.add(cur_av_frequency);
+            if (!quiet) {
+                System.out.println("Final k frequencies " + i + ": " + fin_k_frequency.get(i));
+            }
+            Files.writeString(outPartPaths.get(i).get("kFinFreq"), fin_k_frequency.get(i).values().toString().replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         }
-        if (!quiet) {
-            System.out.println("Final k frequencies:" + fin_k_frequency);
-        }
-        Files.writeString(kFinFreqPath, fin_k_frequency.values().toString().replace("[", "").replace("]", "") + System.lineSeparator(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 
         if (game instanceof ForgivenessDonationGame) {
             Map<Double,Double> av_f_frequency = new TreeMap<Double,Double>();

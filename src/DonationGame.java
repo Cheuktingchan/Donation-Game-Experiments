@@ -18,6 +18,7 @@ public class DonationGame {
     boolean preventNegativePayoffs; // whether to prevent negative rewards
     // NB: Nowak and Sigmund (NS) use the addition of 0.1 to both agents in an interaction to prevent negative payoffs 
     int[] coop_count; // number of donations used to calculate cooperation rate
+    int[] act_count; // number of interations used to calculate cooperation rate
     int numConsecK; // number of consecutive generations that have reached a norm of K
     int network; // 0 = Fully Connected, 1 = Bipartite
     int[][] outPartShape;
@@ -43,6 +44,7 @@ public class DonationGame {
         this.rewards = new double[n];
         this.outPartShape = outPartShape;
         this.coop_count = new int [outPartShape.length];
+        this.act_count = new int [outPartShape.length];
     }
 
     public int[] getStrategies() {
@@ -57,12 +59,12 @@ public class DonationGame {
         return rewards;
     }
 
-    public double getAverageReward() {
-        return Arrays.stream(rewards).average().orElse(Double.NaN);
+    public double getAverageReward(int rangeStart, int rangeEnd) {
+        return Arrays.stream(Arrays.copyOfRange(rewards, rangeStart, rangeEnd)).average().orElse(Double.NaN);
     }
 
-    public double getRewardVariance() {
-        double mean = getAverageReward();
+    public double getRewardVariance(int rangeStart, int rangeEnd) {
+        double mean = getAverageReward(rangeStart, rangeEnd);
         double squaredDifferences = 0;
 
         for (double value : rewards) {
@@ -153,15 +155,22 @@ public class DonationGame {
                 network == 1 && (recipient < n/2 && donor < n/2)) { // bipartite condition
                 recipient = rand.nextInt(n);
             }
+            int cumInd = 0;
+            for (int j = 0; j < outPartShape.length; j++){
+                cumInd += outPartShape[j].length;
+                if (cumInd - outPartShape[j].length <= donor && donor < cumInd){
+                    act_count[j] += 1;
+                }
+            }
             double imageScore = getImageScore(donor, recipient);
             if (imageScore >= strategies[donor]) {
                 rewards[donor] -= c;
                 rewards[recipient] += b;
                 cooperateImageUpdate(donor);
-                int cumInd = 0;
+                cumInd = 0;
                 for (int j = 0; j < outPartShape.length; j++){
                     cumInd += outPartShape[j].length;
-                    if (cumInd - outPartShape[j].length <= donor && donor < cumInd ){
+                    if (cumInd - outPartShape[j].length <= donor && donor < cumInd){
                         coop_count[j] += 1;
                     }
                 }
