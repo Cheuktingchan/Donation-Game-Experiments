@@ -1,6 +1,7 @@
 import java.util.random.*;
 import java.util.stream.DoubleStream;
 import java.util.Arrays;
+import java.util.Random;
 import java.text.DecimalFormat;
 
 // Implementation of the basic donation game as described by Nowak and Sigmund
@@ -20,8 +21,9 @@ public class DonationGame {
     int[] coop_count; // number of donations used to calculate cooperation rate
     int[] act_count; // number of interations used to calculate cooperation rate
     int numConsecK; // number of consecutive generations that have reached a norm of K
-    int network; // 0 = Fully Connected, 1 = Bipartite
+    int network; // 0 = Fully Connected, 1 = Bipartite, 2 = Random, 3 = Community, 4 = Scale-Free, 5 = Small-World
     int[][] outPartShape;
+    boolean[][] adjMat; // donor-recipient edges
     protected final static double b = 1; // benefit from receiving a donation
     protected final static double c = 0.1; // cost of donation
 
@@ -45,6 +47,48 @@ public class DonationGame {
         this.outPartShape = outPartShape;
         this.coop_count = new int [outPartShape.length];
         this.act_count = new int [outPartShape.length];
+        this.adjMat = new boolean[n][n];
+        if (network == 1){ // bipartite
+            Random random = new Random();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i == j){
+                        this.adjMat[i][j] = false;
+                        this.adjMat[j][i] = false;
+                    }else{
+                        boolean samePart = (i < n/2 && j < n/2) || (i >= n/2 && j >= n/2);
+                        this.adjMat[i][j] = samePart;
+                        this.adjMat[j][i] = samePart;
+                    }
+                }
+            }
+        }else if (network == 2){ // random
+            Random random = new Random();
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i == j){
+                        this.adjMat[i][j] = false;
+                        this.adjMat[j][i] = false;
+                    }else{
+                        boolean isConnected = random.nextBoolean();
+                        this.adjMat[i][j] = isConnected;
+                        this.adjMat[j][i] = isConnected;
+                    }
+                }
+            }
+        }else{ // fully connected
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (i == j){
+                        this.adjMat[i][j] = false;
+                        this.adjMat[j][i] = false;
+                    }else{
+                        this.adjMat[i][j] = true;
+                        this.adjMat[j][i] = true;
+                    }
+                }
+            }
+        }
     }
 
     public int[] getStrategies() {
@@ -151,8 +195,7 @@ public class DonationGame {
         for (int i = 0; i < m; i++) {
             int donor = rand.nextInt(n);
             int recipient = rand.nextInt(n);
-            while (recipient == donor ||
-                network == 1 && (recipient < n/2 && donor < n/2)) { // bipartite condition
+            while (!adjMat[donor][recipient]) { // repick condition
                 recipient = rand.nextInt(n);
             }
             int cumInd = 0;
