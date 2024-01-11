@@ -49,7 +49,6 @@ public class DonationGame {
         this.act_count = new int [outPartShape.length];
         this.adjMat = new boolean[n][n];
         if (network == 1){ // bipartite
-            Random random = new Random();
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     if (i == j){

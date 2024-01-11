@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+for k in {1..100}
+do
+  echo run number ${k}
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 2 -quiet
+done
