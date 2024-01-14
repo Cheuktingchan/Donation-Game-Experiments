@@ -69,9 +69,36 @@ public class DonationGame {
                         this.adjMat[i][j] = false;
                         this.adjMat[j][i] = false;
                     }else{
-                        boolean isConnected = random.nextBoolean();
+                        boolean isConnected = random.nextFloat() < 0.5; // adjust probability of connection
                         this.adjMat[i][j] = isConnected;
                         this.adjMat[j][i] = isConnected;
+                    }
+                }
+            }
+        }else if (network == 3){ // community
+            int numCommunities = 4;
+            Random random = new Random();
+    
+            // connect nodes within communities
+            int nodesPerCommunity = n / numCommunities;
+            for (int community = 0; community < numCommunities; community++) {
+                for (int i = community * nodesPerCommunity; i < (community + 1) * nodesPerCommunity; i++) {
+                    for (int j = i + 1; j < (community + 1) * nodesPerCommunity; j++) {
+                        this.adjMat[i][j] = true;
+                        this.adjMat[j][i] = true;
+                    }
+                }
+            }
+
+            // connect nodes between communities on a probability
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    if (!this.adjMat[i][j]) { // only connect if not already connected within the community
+                        boolean isConnected = random.nextFloat() < 0.5;
+                        if (isConnected) {
+                            this.adjMat[i][j] = true;
+                            this.adjMat[j][i] = true;
+                        }
                     }
                 }
             }
