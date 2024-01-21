@@ -1,7 +1,11 @@
 import java.util.random.*;
 import java.util.stream.DoubleStream;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.text.DecimalFormat;
 
 // Implementation of the basic donation game as described by Nowak and Sigmund
@@ -29,7 +33,53 @@ public class DonationGame {
 
     protected static RandomGenerator rand = RandomGenerator.of("Xoroshiro128PlusPlus");
     protected static final DecimalFormat df = new DecimalFormat("0.00");
+    
+    private static Set<Integer> preferentialAttachment(Map<Integer, Set<Integer>> adjacencyList, int newNode, Random random) {
+        Set<Integer> existingNodes = adjacencyList.keySet();
+        double totalDegree = 0;
 
+        for (int existingNode : existingNodes) {
+            totalDegree += adjacencyList.get(existingNode).size();
+        }
+
+        Set<Integer> newConnections = new HashSet<>();
+
+        while (newConnections.size() == 0) {
+            for (int existingNode : existingNodes) {
+                double probability = adjacencyList.get(existingNode).size() / totalDegree;
+                if (random.nextDouble() < probability) {
+                    newConnections.add(existingNode);
+                }
+            }
+        }
+
+        return newConnections;
+    }
+
+    private static double[] calculateAttachmentProbabilities(Map<Integer, Set<Integer>> adjList) {
+        double[] probabilities = new double[adjList.size()];
+        int totalDegree = 0;
+
+        for (int node : adjList.keySet()) {
+            totalDegree += adjList.get(node).size();
+        }
+
+        for (int i = 0; i < probabilities.length; i++) {
+            double degreeRatio = (double) adjList.get(i).size() / totalDegree;
+            probabilities[i] = degreeRatio;
+        }
+
+        return probabilities;
+    }
+
+    private static void printMatrix(boolean[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                System.out.print(matrix[i][j] ? "1 " : "0 ");
+            }
+            System.out.println();
+        }
+    }
 
     public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, int network, int[][] outPartShape) {        
         this.n = n;
@@ -102,6 +152,78 @@ public class DonationGame {
                     }
                 }
             }
+        } else if (network == 4){ // scale-free
+            int initialNodes = 3;
+            Random random = new Random();
+            Map<Integer, Set<Integer>> adjList = new HashMap<>();
+
+            // initialize the network with a small number of nodes
+            for (int i = 0; i < initialNodes; i++) {
+                adjList.put(i, new HashSet<>());
+            }
+            for (int i = 0; i < initialNodes; i++) {
+                for (int j = 0; j < initialNodes; j++) {
+                    if (i != j) {
+                        adjList.get(i).add(j);
+                        adjList.get(j).add(i);
+                    }
+                }
+            }
+    
+            // grow the network using the Barabási–Albert model
+            for (int i = initialNodes; i < n; i++) {
+                Set<Integer> newConnections = preferentialAttachment(adjList, i, random);
+                adjList.put(i, newConnections);
+
+                // update existing nodes with new connections
+                for (int connection : newConnections) {
+                    adjList.get(connection).add(i);
+                }
+            }
+
+            //convert to adjacency matrix
+            for (int i = 0; i < n; i++) {
+                Set<Integer> neighbors = adjList.get(i);
+    
+                if (neighbors != null) {
+                    for (int neighbor : neighbors) {
+                        this.adjMat[i][neighbor] = true;
+                        this.adjMat[neighbor][i] = true;
+                    }
+                }
+            }
+        }else if (network == 5){ // small-world
+            int neighborDistance = 4;
+            double rewiringP = 0.2;
+            // Initialize the regular ring lattice
+            for (int i = 0; i < n; i++) {
+                for (int j = i - neighborDistance; j <= i + neighborDistance; j++) {
+                    if (j != i && j >= 0 && j < n) {
+                        this.adjMat[i][j] = true;
+                        this.adjMat[j][i] = true;
+                    }
+                }
+            }
+
+            // Rewire edges with a certain probability
+            Random random = new Random();
+            for (int i = 0; i < n; i++) {
+                for (int neighbor = 0; neighbor < n; neighbor++) {
+                    if (this.adjMat[i][neighbor] && random.nextDouble() < rewiringP) {
+                        int newNeighbor;
+                        do {
+                            newNeighbor = random.nextInt(n);
+                        } while (newNeighbor == i || this.adjMat[i][newNeighbor]);
+
+                        this.adjMat[i][neighbor] = false;
+                        this.adjMat[neighbor][i] = false;
+
+                        this.adjMat[i][newNeighbor] = true;
+                        this.adjMat[newNeighbor][i] = true;
+                    }
+                }
+            }
+
         }else{ // fully connected
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
@@ -116,7 +238,7 @@ public class DonationGame {
             }
         }
     }
-
+    
     public int[] getStrategies() {
         return strategies;
     }
