@@ -105,7 +105,7 @@ public class DonationGame {
                         this.adjMat[i][j] = false;
                         this.adjMat[j][i] = false;
                     }else{
-                        boolean samePart = (i < n/2 && j < n/2) || (i >= n/2 && j >= n/2);
+                        boolean samePart = (i < n/2 && j >= n/2) || (i >= n/2 && j < n/2);
                         this.adjMat[i][j] = samePart;
                         this.adjMat[j][i] = samePart;
                     }

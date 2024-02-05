@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+python_script="scripts/analysis/sd.py"
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <csv_folder>"
+    exit 1
+fi
+
+csv_folder="$1"
+
+# use find to recursively run on all csv files
+find "$csv_folder" -type f -regex ".*/n.*\.csv$" -exec sh -c 'echo "Processing file: $0"; python3 "$1" "$0"; echo "--------------------------"' {} "$python_script" \;
