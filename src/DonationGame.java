@@ -1,5 +1,6 @@
 import java.util.random.*;
 import java.util.stream.DoubleStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ public class DonationGame {
     int network; // 0 = Fully Connected, 1 = Bipartite, 2 = Random, 3 = Community, 4 = Scale-Free, 5 = Small-World
     int[][] outPartShape;
     boolean[][] adjMat; // donor-recipient edges
+    ArrayList<int[]> edgeList;
     protected final static double b = 1; // benefit from receiving a donation
     protected final static double c = 0.1; // cost of donation
 
@@ -98,6 +100,7 @@ public class DonationGame {
         this.coop_count = new int [outPartShape.length];
         this.act_count = new int [outPartShape.length];
         this.adjMat = new boolean[n][n];
+        this.edgeList = new ArrayList<int[]>();
         if (network == 1){ // bipartite
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
@@ -237,6 +240,16 @@ public class DonationGame {
                 }
             }
         }
+
+        // convert adjacency matrix to edgeList
+        for (int i = 0; i < this.adjMat.length; i++) {
+            for (int j = i + 1; j < this.adjMat[i].length; j++) {
+                if (this.adjMat[i][j] == true) {
+                    this.edgeList.add(new int[]{i, j});
+                    this.edgeList.add(new int[]{j, i}); // both edges - directed
+                }
+            }
+        }
     }
     
     public int[] getStrategies() {
@@ -341,11 +354,11 @@ public class DonationGame {
 
     public void tick() {
         for (int i = 0; i < m; i++) {
-            int donor = rand.nextInt(n);
-            int recipient = rand.nextInt(n);
-            while (!adjMat[donor][recipient]) { // repick condition
-                recipient = rand.nextInt(n);
-            }
+            int[] randomEdge = edgeList.get(rand.nextInt(edgeList.size()));
+    
+            int donor = randomEdge[0];
+            int recipient = randomEdge[1];
+        
             int cumInd = 0;
             for (int j = 0; j < outPartShape.length; j++){
                 cumInd += outPartShape[j].length;
