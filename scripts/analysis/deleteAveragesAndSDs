@@ -1,0 +1,8 @@
+#!/bin/bash
+
+root_folder="data"
+
+find "$root_folder" -type f -name "averages.csv" -delete
+find "$root_folder" -type f -name "SDs.csv" -delete
+
+echo "Files deleted successfully."
