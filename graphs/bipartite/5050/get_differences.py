@@ -9,17 +9,23 @@ def calculate_differences(file1_path, file2_path):
     # If the structure is different, you might need to align the data accordingly
 
     # Calculate the differences
-    differences = df1 - df2
+    differences = abs(df1 - df2)
 
     print(df1)
     print(df2)
     return differences
 
 if __name__ == "__main__":
-    file1_path = "data/bipartite/50-50/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net1_endNFalse_coop-rate0-50.csv"
-    file2_path = "data/bipartite/50-50/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net1_endNFalse_coop-rate50-100.csv"
+    file1_path = "data/bipartite/50-50/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net1_endNFalse_reward-final0-50.csv"
+    file2_path = "data/bipartite/50-50/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net1_endNFalse_reward-final50-100.csv"
 
     result = calculate_differences(file1_path, file2_path)
 
     print("Differences:")
     print(result)
+
+    mean_diff = result.mean().values[0]
+    std_diff = result.std().values[0]
+
+    print("\nMean of Differences:", mean_diff)
+    print("Standard Deviation of Differences:", std_diff)

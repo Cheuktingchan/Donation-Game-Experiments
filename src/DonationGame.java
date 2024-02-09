@@ -122,7 +122,7 @@ public class DonationGame {
                         this.adjMat[i][j] = false;
                         this.adjMat[j][i] = false;
                     }else{
-                        boolean isConnected = random.nextFloat() < 0.125; // adjust probability of connection
+                        boolean isConnected = random.nextFloat() < 0.5; // adjust probability of connection
                         this.adjMat[i][j] = isConnected;
                         this.adjMat[j][i] = isConnected;
                     }
