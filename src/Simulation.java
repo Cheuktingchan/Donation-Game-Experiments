@@ -276,7 +276,17 @@ public class Simulation {
 
         double[][] rewardAverages = new double [outPartShape.length][generations];
         double[][] varianceRewards = new double [outPartShape.length][generations];
+
         ArrayList<TreeMap<Integer,Integer>> k_counts = new ArrayList<TreeMap<Integer,Integer>>();
+        ArrayList<TreeMap<Integer,Integer>> k_counts_final = new ArrayList<TreeMap<Integer,Integer>>();
+        ArrayList<TreeMap<Integer,Double>> av_k_frequency = new ArrayList<TreeMap<Integer,Double>>();
+        ArrayList<TreeMap<Integer,Double>> fin_k_frequency = new ArrayList<TreeMap<Integer,Double>>();
+
+        // Note, this is only used for forgiveness games
+        // This is an inefficient hack to inspect forgiveness strategy frequencies, and
+        // if used for more than occasional evaluation should be refactored. 
+        Map<Double,Integer> f_counts = new TreeMap<Double,Integer>();
+
         cumInd = 0;
         for (int i = 0; i < outPartShape.length; i++){
             cumInd += outPartShape[i].length;
@@ -290,15 +300,6 @@ public class Simulation {
             }
             k_counts.add(cur_counts);
         }
-
-        ArrayList<TreeMap<Integer,Integer>> k_counts_final = new ArrayList<TreeMap<Integer,Integer>>();
-        ArrayList<TreeMap<Integer,Double>> av_k_frequency = new ArrayList<TreeMap<Integer,Double>>();
-        ArrayList<TreeMap<Integer,Double>> fin_k_frequency = new ArrayList<TreeMap<Integer,Double>>();
-
-        // Note, this is only used for forgiveness games
-        // This is an inefficient hack to inspect forgiveness strategy frequencies, and
-        // if used for more than occasional evaluation should be refactored. 
-        Map<Double,Integer> f_counts = new TreeMap<Double,Integer>();
 
         for (int i = 0; i < generations; i++) {
             game.tick();
@@ -341,6 +342,8 @@ public class Simulation {
             }
             game.rouletteWheelSelection();
             game.mutation();
+            
+            // for intervals: the reward variance is final, usually it is cumulative (average of all gens)
 
             if (intervals != 0 && i % intervals == 0) {
 
@@ -357,10 +360,11 @@ public class Simulation {
                     }
                     k_counts_final.add(cur_counts);
                 }
-
+                
                 for (int j = 0; j < outPartShape.length; j++){
-                    double averageReward = Arrays.stream(rewardAverages[j]).sum() / (double) generations;
-                    double finReward = rewardAverages[j][generations-1];
+                    // average reward up until now
+                    double averageReward = Arrays.stream(rewardAverages[j]).sum() / (double) (i+1);
+                    double finReward = rewardAverages[j][i];
                     if (!quiet) {
                         System.out.println("Average reward: "  + j + ": " + averageReward);
                     }
@@ -371,7 +375,7 @@ public class Simulation {
                     }
                     Files.writeString(outPartPaths.get(j).get("rewardFin"), finReward + ";", StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         
-                    double rewardVariance = Arrays.stream(varianceRewards[j]).sum() / (double) generations;
+                    double rewardVariance = varianceRewards[j][i];
                     if (!quiet) {
                         System.out.println("Reward variance: "  + j + ": " + rewardVariance);
                     }
@@ -386,7 +390,7 @@ public class Simulation {
                     TreeMap<Integer,Double> cur_av_frequency = new TreeMap<Integer,Double>();
                     for (int k = -5; k < 7; k++) {
                         if (k_counts.get(j).containsKey(k)) {
-                            cur_av_frequency.put(k, ((double) k_counts.get(j).get(k)) / (outPartShape[j].length * generations));
+                            cur_av_frequency.put(k, ((double) k_counts.get(j).get(k)) / (outPartShape[j].length * (i+1)));
                         } else {
                             cur_av_frequency.put(k, 0.0);
                         }
@@ -412,6 +416,9 @@ public class Simulation {
                     }
                     Files.writeString(outPartPaths.get(j).get("kFinFreq"), fin_k_frequency.get(j).values().toString().replace("[", "").replace("]", "") + ";", StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                 }
+                k_counts_final.clear();
+                fin_k_frequency.clear();
+                av_k_frequency.clear();
             }
         }
         
