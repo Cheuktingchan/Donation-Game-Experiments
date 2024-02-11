@@ -43,7 +43,6 @@ public class Simulation {
         options.addOption(new Option("fa", "forgiveness_action", false, "Enable action forgiveness"));
         options.addOption(new Option("fr", "forgiveness_reputation", false, "Enable reputation (assessment) forgiveness"));
         options.addOption(new Option("g", "generations", true, "Generations to run simulation for"));
-        options.addOption(new Option("net", "network", true, "0 = Fully Connected, 1 = Bipartite"));
         options.addOption(new Option("endN", false, "End generations when a single k norm reached"));
         options.addOption(new Option("intervals", true, "Data collected at intervals of generations"));
         Option outPartOption = Option.builder("outPart")
@@ -51,6 +50,12 @@ public class Simulation {
             .desc("Partition indices for output data")
             .build();
         options.addOption(outPartOption);
+        Option net = Option.builder("net")
+        .hasArgs()
+        .desc("0 = Fully Connected, 1 = Bipartite, 2 = Random(n), 3 = Community(n,p), 4 = Scale-Free(n), 5 = Small-World(n,p)")
+        .build();
+        options.addOption(net);
+
         options.addOption(new Option("quiet", false, "Run with minimal output"));
         CommandLineParser parser = new DefaultParser(false);
         CommandLine cmd = parser.parse(options, args);
@@ -70,7 +75,7 @@ public class Simulation {
         boolean fr;
         int generations;
         boolean quiet;
-        int network;
+        double[] network;
         boolean endN; // whether endN mode is on
         int intervals;
         int[][] outPartShape;
@@ -85,9 +90,13 @@ public class Simulation {
             endN = false;
         }
         if(cmd.hasOption("net")) {
-            network = Integer.parseInt(cmd.getOptionValue("net"));
+            String[] netStrs = cmd.getOptionValues("net");
+            network = new double[netStrs.length];
+            for (int i = 0; i < netStrs.length; i++){
+                network[i] = Double.parseDouble(netStrs[i]);
+            }
         } else {
-            network = 0;
+            network = new double[]{0};
         }
         if(cmd.hasOption("intervals")) {
             intervals = Integer.parseInt(cmd.getOptionValue("intervals"));
@@ -216,7 +225,7 @@ public class Simulation {
         sb.append("_fa" + (fa ? "True" : "False"));
         sb.append("_fr" + (fr ? "True" : "False"));
         sb.append("_g" + generations );
-        sb.append("_net" + network );
+        sb.append("_net" + Arrays.toString(network) );
         sb.append("_intervals" + intervals);
         sb.append("_endN" + (endN ? "True" : "False") );
         String fileName = sb.toString();

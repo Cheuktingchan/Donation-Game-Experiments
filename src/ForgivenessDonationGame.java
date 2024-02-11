@@ -13,7 +13,7 @@ public class ForgivenessDonationGame extends NoisyDonationGame {
     static double[] forgivenessStrategySpace = {0.001, 0.5, 1.0, 1.355, 1.67};
 
     public ForgivenessDonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, 
-        double er, double ea, boolean fa, boolean fr, int network, int[][] outPartShape) {
+        double er, double ea, boolean fa, boolean fr, double[] network, int[][] outPartShape) {
             super(n, m, q, mr, preventNegativePayoffs, er, ea, network, outPartShape);
             this.fa = fa;
             this.fr = fr;

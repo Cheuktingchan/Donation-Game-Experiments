@@ -26,10 +26,20 @@ public class DonationGame {
     int[] coop_count; // number of donations used to calculate cooperation rate
     int[] act_count; // number of interations used to calculate cooperation rate
     int numConsecK; // number of consecutive generations that have reached a norm of K
-    int network; // 0 = Fully Connected, 1 = Bipartite, 2 = Random, 3 = Community, 4 = Scale-Free, 5 = Small-World
+
+    // 0 = Fully Connected, 1 = Bipartite, 2 = Random, 3 = Community, 4 = Scale-Free, 5 = Small-World
+    double[] network; // network[0] specifies network. Optional: network[1] specifies n, network[2] specifies p 
     int[][] outPartShape;
     boolean[][] adjMat; // donor-recipient edges
     ArrayList<int[]> edgeList;
+
+    double randomP;
+    int numCommunities;
+    double communityP;
+    int initialNodes;
+    int neighborDistance;
+    double rewiringP;
+
     protected final static double b = 1; // benefit from receiving a donation
     protected final static double c = 0.1; // cost of donation
 
@@ -83,12 +93,12 @@ public class DonationGame {
         }
     }
 
-    public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, int network, int[][] outPartShape) {        
+    public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, double[] network, int[][] outPartShape) {        
         this.n = n;
         this.m = m;
         this.q = q;
         this.mr = mr;
-        this.network = network;
+        this.network = network; // network is a array of double params specified below.
         this.preventNegativePayoffs = preventNegativePayoffs;
         this.strategies = new int[n];
         for (int i = 0; i < strategies.length; i++) {
@@ -101,7 +111,19 @@ public class DonationGame {
         this.act_count = new int [outPartShape.length];
         this.adjMat = new boolean[n][n];
         this.edgeList = new ArrayList<int[]>();
-        if (network == 1){ // bipartite
+        
+        // default network params: 
+        this.randomP = 0.5; // random(p)
+
+        this.numCommunities = 4; // community(n,p)
+        this.communityP = 0.5;
+
+        this.initialNodes = 3; // scale-free(n)
+
+        this.neighborDistance = 4; // small-world(n,p)
+        this.rewiringP = 0.2;
+
+        if (network[0] == 1){ // bipartite
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     if (i == j){
@@ -114,7 +136,10 @@ public class DonationGame {
                     }
                 }
             }
-        }else if (network == 2){ // random
+        }else if (network[0] == 2){ // random
+            if (network.length >= 2){
+                randomP = network[1];
+            }
             Random random = new Random();
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
@@ -122,14 +147,19 @@ public class DonationGame {
                         this.adjMat[i][j] = false;
                         this.adjMat[j][i] = false;
                     }else{
-                        boolean isConnected = random.nextFloat() < 0.5; // adjust probability of connection
+                        boolean isConnected = random.nextFloat() < randomP; // adjust probability of connection
                         this.adjMat[i][j] = isConnected;
                         this.adjMat[j][i] = isConnected;
                     }
                 }
             }
-        }else if (network == 3){ // community
-            int numCommunities = 4;
+        }else if (network[0] == 3){ // community
+            if (network.length >= 2){
+                numCommunities = (int) network[1];
+            }
+            if (network.length == 3){
+                communityP = network[2];
+            }
             Random random = new Random();
     
             // connect nodes within communities
@@ -147,7 +177,7 @@ public class DonationGame {
             for (int i = 0; i < n; i++) {
                 for (int j = i + 1; j < n; j++) {
                     if (!this.adjMat[i][j]) { // only connect if not already connected within the community
-                        boolean isConnected = random.nextFloat() < 0.5;
+                        boolean isConnected = random.nextFloat() < communityP;
                         if (isConnected) {
                             this.adjMat[i][j] = true;
                             this.adjMat[j][i] = true;
@@ -155,8 +185,10 @@ public class DonationGame {
                     }
                 }
             }
-        } else if (network == 4){ // scale-free
-            int initialNodes = 3;
+        } else if (network[0] == 4){ // scale-free
+            if (network.length >= 2){
+                initialNodes = (int) network[1];
+            }
             Random random = new Random();
             Map<Integer, Set<Integer>> adjList = new HashMap<>();
 
@@ -195,9 +227,13 @@ public class DonationGame {
                     }
                 }
             }
-        }else if (network == 5){ // small-world
-            int neighborDistance = 4;
-            double rewiringP = 0.2;
+        }else if (network[0] == 5){ // small-world
+            if (network.length >= 2){
+                neighborDistance = (int) network[1];
+            }
+            if (network.length >= 3){
+                rewiringP = network[2];
+            }
             // Initialize the regular ring lattice
             for (int i = 0; i < n; i++) {
                 for (int j = i - neighborDistance; j <= i + neighborDistance; j++) {
@@ -472,7 +508,7 @@ public class DonationGame {
 
     // simple main method to test things are working with toy instantiation 
     public static void main(String[] args) throws Exception {
-        DonationGame game = new DonationGame(10, 30, 1.0, 0.001, false, 0, new int[1][]);
+        DonationGame game = new DonationGame(10, 30, 1.0, 0.001, false, new double[]{0}, new int[1][]);
         int generations = 10;
         for (int i = 0; i < generations; i++) {
             System.out.println("g " + i);

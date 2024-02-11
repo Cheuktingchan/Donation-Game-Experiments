@@ -9,14 +9,9 @@ def average_columns(csv_file):
         data = [list(filter(None, row.split(';'))) for row in lines if row.strip()]
         modified_data = [[list(map(float, inner.split(', '))) for inner in outer] for outer in data]
 
-        # Convert the original array to a numpy array
         modified_data = np.array(modified_data)
 
-        # Calculate the mean along axis 1
         averages = np.mean(modified_data, axis=0)
-
-        # Print the averages
-        print(len(averages))
         
         return averages
 
