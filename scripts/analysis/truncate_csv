@@ -1,0 +1,28 @@
+#!/bin/bash
+
+process_csv() {
+    local file="$1"
+    local temp_file=$(mktemp)
+
+    awk 'NR <= 100 { print }' "$file" > "$temp_file"
+    
+    mv "$temp_file" "$file"
+}
+
+export -f process_csv  # export the function for use with find
+
+
+recursive_process() {
+    local dir="$1"
+
+    find "$dir" -type f -name "*.csv" -exec bash -c 'process_csv "$0"' {} \;
+}
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <directory>"
+    exit 1
+fi
+
+recursive_process "$1"
+
+echo "Processing completed!"
