@@ -93,6 +93,18 @@ public class DonationGame {
         }
     }
 
+    private static int getNumEdges(boolean[][] matrix) {
+        int total = 0;
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j]){
+                    total += 1;
+                }
+            }
+        }
+        return total/2;
+    }
+
     public DonationGame(int n, int m, double q, double mr, boolean preventNegativePayoffs, double[] network, int[][] outPartShape) {        
         this.n = n;
         this.m = m;
@@ -286,6 +298,9 @@ public class DonationGame {
                 }
             }
         }
+        System.out.println("#edges:");
+        System.out.println(getNumEdges(this.adjMat));
+        System.out.println();
     }
     
     public int[] getStrategies() {
