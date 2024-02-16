@@ -5,13 +5,17 @@ import os
 def average_columns(csv_file):
     with open(csv_file, 'r') as file:
         reader = csv.reader(file)
+
         data = list(reader)
+
         columns = zip(*data)
+
         averages = [sum(map(float, col)) / len(col) for col in columns]
+
         return averages
 
 def write_averages_to_file(averages, csv_file, output_file):
-    with open(output_file, 'w', newline='') as file:  # Use 'w' mode to override the file
+    with open(output_file, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["File:"] + [csv_file])
         writer.writerow(["Averages"] + averages)
