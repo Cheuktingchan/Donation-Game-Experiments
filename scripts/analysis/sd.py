@@ -16,10 +16,10 @@ def std_dev_columns(csv_file):
         return std_devs
 
 def write_std_to_file(SDs, csv_file, output_file):
-    with open(output_file, 'a', newline='') as file:
+    with open(output_file, 'w', newline='') as file:  # Use 'w' mode to override the file
         writer = csv.writer(file)
         writer.writerow(["File:"] + [csv_file])
-        writer.writerow(["Averages"] + SDs)
+        writer.writerow(["Standard Deviations"] + SDs)
 
 def main():
     parser = argparse.ArgumentParser(description='Calculate column standard deviations')
@@ -33,7 +33,8 @@ def main():
     SDs = std_dev_columns(csv_file)
 
     write_std_to_file(SDs, csv_file, output_file)
-    print(f"Averages written to {output_file}")
-    print("SD:", SDs)
+    print(f"Standard deviations written to {output_file}")
+    print("Standard Deviations:", SDs)
+
 if __name__ == "__main__":
     main()
