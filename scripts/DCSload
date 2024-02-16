@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+module load OpenJDK/19.0.2
+module load cs342-python
