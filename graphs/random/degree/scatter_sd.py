@@ -8,7 +8,7 @@ def plot_scatter_chart(x_values, y_values, std_dev_values, x_label="X-axis", y_l
     p = np.poly1d(z)
     plt.plot(x_values, p(x_values), 'r--', label="Line of best fit")
 
-    plt.errorbar(x_values, y_values, yerr=std_dev_values, fmt='none', ecolor='gray', capsize=5, label='Error Bars')
+    plt.errorbar(x_values, y_values, yerr=std_dev_values, fmt='none', ecolor='gray', capsize=5, label='Error bars')
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
