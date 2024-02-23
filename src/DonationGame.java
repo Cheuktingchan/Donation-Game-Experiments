@@ -9,6 +9,11 @@ import java.util.Random;
 import java.util.Set;
 import java.text.DecimalFormat;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.io.*;
+
 // Implementation of the basic donation game as described by Nowak and Sigmund
 // M. A. Nowak and K. Sigmund, ‘Evolution of indirect reciprocity by
 // image scoring’, Nature, 393, 573–577, (1998).
@@ -298,9 +303,17 @@ public class DonationGame {
                 }
             }
         }
+        System.out.println("TEXT");
         System.out.println("#edges:");
         System.out.println(getNumEdges(this.adjMat));
         System.out.println();
+/*         try{
+            PrintWriter pr = new PrintWriter(new FileWriter("edges.txt", true));
+            pr.println(getNumEdges(this.adjMat));
+            pr.close();
+        }catch (IOException e){
+            System.err.println("File not found: " + e.getMessage());
+        } */
     }
     
     public int[] getStrategies() {

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Check if the root folder is provided as a command-line argument
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <root_folder>"
+    exit 1
+fi
+
+# Set the path to the Python script
+python_script="scripts/analysis/intervals/average_x_file.py"
+
+# Set the root folder from the command-line argument
+root_folder="$1"
+
+# Find all files recursively starting with "n100" and not containing "kAvFreq" or "kFinFreq"
+files=$(find "$root_folder" -type f -name "n100*" ! -name "*kAvFreq*" ! -name "*kFinFreq*")
+
+# Loop through the files and run the Python script with each file as an argument
+IFS=$'\n' # Set Internal Field Separator to handle spaces in filenames
+for file in $files; do
+    echo "Running $python_script with file: $file"
+    python3 "$python_script" "$file"
+done

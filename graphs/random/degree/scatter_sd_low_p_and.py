@@ -4,16 +4,17 @@ import numpy as np
 def plot_scatter_chart(x_values, y_values, std_dev_values, x_label="X-axis", y_label="Y-axis", output_file="graphs/images/2_n_coop_sd_low_p_and.png"):
     plt.scatter(x_values, y_values, label="Data points", marker='o', color='blue')  # Adjust marker and color as needed
 
-    coefficients = np.polyfit(x_values, y_values, 2)
+    # Fit a logarithmic curve to the data
+    coefficients = np.polyfit(np.log(x_values), y_values, 1)
     polynomial = np.poly1d(coefficients)
 
-    # Generate a smooth curve using the polynomial
+    # Generate a smooth curve using the logarithmic function
     x_smooth = np.linspace(min(x_values), max(x_values), 100)
-    y_smooth = polynomial(x_smooth)
+    y_smooth = polynomial(np.log(x_smooth))
 
-    plt.plot(x_smooth, y_smooth, 'r--', label=f"Curve of best fit (degree={2})")
+    plt.plot(x_smooth, y_smooth, 'r--', label="Curve of best fit")
 
-    plt.errorbar(x_values, y_values, yerr=std_dev_values, fmt='none', ecolor='gray', capsize=5, label='Error bars')
+    plt.errorbar(x_values, y_values, yerr=std_dev_values, fmt='none', ecolor='gray', capsize=5, label='Standard deviation')
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
