@@ -1,0 +1,46 @@
+{
+  "data/original/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_endNTrue_reward-final": [
+    0.0
+  ],
+  "data/original/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_endNTrue_single-norm.csv": [
+    3.3626775046084925,
+    1033.8076948349726
+  ],
+  "data/original/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_endNTrue_reward-variances": [
+    0.02948667972548585
+  ],
+  "data/original/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_endNTrue_coop-rate": [
+    0.2532844545592618
+  ],
+  "data/original/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_endNTrue_kAvFreq": [
+    0.001984688576972216,
+    0.002603520297723642,
+    0.004280457618612641,
+    0.006372528349875267,
+    0.005581144359609417,
+    0.0035349474306047325,
+    8.5166390671438e-05,
+    0.00011728429248624899,
+    0.00038462587419465166,
+    0.002568070529821173,
+    0.0025710215033180875,
+    0.0024211001493657795
+  ],
+  "data/original/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_endNTrue_kFinFreq": [
+    0.139978426909292,
+    0.139978426909292,
+    0.2170138014044268,
+    0.3661078939329225,
+    0.38345924164114237,
+    0.3832921992423013,
+    0.0009949874371066201,
+    0.0009949874371066201,
+    0.0009949874371066201,
+    0.2987723380770047,
+    0.33600892845280167,
+    0.3666060555964672
+  ],
+  "data/original/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_endNTrue_reward-averages": [
+    0.026482147766773132
+  ]
+}

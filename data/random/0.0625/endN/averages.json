@@ -1,0 +1,46 @@
+{
+  "data/random/0.0625/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net2_endNTrue_coop-rate": [
+    0.8330822974440001
+  ],
+  "data/random/0.0625/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net2_endNTrue_reward-averages": [
+    0.03875226606000002
+  ],
+  "data/random/0.0625/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net2_endNTrue_reward-variances": [
+    0.05874765731730004
+  ],
+  "data/random/0.0625/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net2_endNTrue_kFinFreq": [
+    0.02606,
+    0.04802,
+    0.13986,
+    0.16193999999999997,
+    0.1719,
+    0.19379999999999997,
+    0.00016,
+    0.00014000000000000001,
+    8e-05,
+    0.014119999999999999,
+    0.08395999999999999,
+    0.15996
+  ],
+  "data/random/0.0625/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net2_endNTrue_kAvFreq": [
+    0.0010990842,
+    0.0021927565999999986,
+    0.0032148662,
+    0.002745216799999998,
+    0.002982042000000001,
+    0.002074066800000002,
+    7.169079999999992e-05,
+    6.962200000000002e-05,
+    9.050899999999998e-05,
+    0.00037608659999999996,
+    0.0009256542000000003,
+    0.0016006247999999982
+  ],
+  "data/random/0.0625/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net2_endNTrue_single-norm.csv": [
+    0.198,
+    1743.222
+  ],
+  "data/random/0.0625/endN/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net2_endNTrue_reward-final": [
+    0.0
+  ]
+}

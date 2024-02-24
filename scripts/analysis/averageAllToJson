@@ -10,7 +10,7 @@ folder_path="$1"
 file_name="$2"
 
 find "$folder_path" -type f -name "$file_name" | while read -r file; do
-    python scripts/analysis/average_to_json.py "$file"
+    python3 scripts/analysis/average_to_json.py "$file"
 done
 
 echo "Processing completed for all '$file_name' files in the folder: $folder_path"

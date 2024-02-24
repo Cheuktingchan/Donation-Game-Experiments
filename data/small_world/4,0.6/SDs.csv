@@ -1,0 +1,12 @@
+File:,"data/small_world/4,0.6/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.6]_intervals0_endNFalse_kAvFreq0-100.csv"
+Averages,0.013316746363207906,0.02311486491467722,0.05103251173998195,0.08169658112338637,0.06587129971055208,0.06853710124821401,0.0006234521559702877,0.0008838845304738624,0.0022948687678810745,0.013144010164100568,0.03599997763293654,0.044273366884432216
+File:,"data/small_world/4,0.6/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.6]_intervals0_endNFalse_reward-averages0-100.csv"
+Averages,0.16979199396635342
+File:,"data/small_world/4,0.6/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.6]_intervals0_endNFalse_kFinFreq0-100.csv"
+Averages,0.2059789066870683,0.11754705440801143,0.3920190173958401,0.3870970937633089,0.33544792442344906,0.35241844446623394,0.04683844574705698,0.03112298186228305,0.00818535277187245,0.14632757771520719,0.25754463690785717,0.2932832078384305
+File:,"data/small_world/4,0.6/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.6]_intervals0_endNFalse_reward-variances0-100.csv"
+Averages,0.2368047259536643
+File:,"data/small_world/4,0.6/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.6]_intervals0_endNFalse_reward-final0-100.csv"
+Averages,1.1219455699364387
+File:,"data/small_world/4,0.6/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.6]_intervals0_endNFalse_coop-rate0-100.csv"
+Averages,0.06288592592696449
