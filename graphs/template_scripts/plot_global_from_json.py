@@ -58,7 +58,9 @@ def plot_attributes_with_error_bars(data_dict_list, std_dev_list, x_values, x_ax
                     yerr=std_dev_data.get(attribute_name, 0),  # Use 0 if standard deviation data is not available
                     marker='o',
                     label=f'Graph {i+1}',
-                    color="b"
+                    color="grey",
+                    markerfacecolor="blue",
+                    markeredgecolor="blue"
                 )
 
         # Customize the plot as needed (add titles, labels, etc.)
@@ -74,7 +76,9 @@ def plot_attributes_with_error_bars(data_dict_list, std_dev_list, x_values, x_ax
             y_label = "Reward variances (all generations)"
         plt.ylabel(y_label)
         #plt.legend()
-        
+        if x_axis == "Number of initial nodes":
+            plt.xticks(np.arange(min(x_values), max(x_values) + 1, 2))
+
         # Show or save the plot (you can customize this part)#
         save_filename = f"{attribute_name.replace(' ', '_')}_error_bars_plot.png"
         save_filepath = os.path.join('graphs/images', save_filename)
@@ -119,6 +123,8 @@ SD_random_p = ['data/random/0.0625/global/SDs.json',
 
 X_random_p = [0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5, 0.5625, 0.625, 0.6875, 0.75, 0.8125, 0.875, 0.9375, 1]
 
+label_random_p = "Connection probability"
+
 scale_free_ini = ['data/scale_free/4,2/averages.json', 
                    'data/scale_free/4,4(original)/global/averages.json',
                    'data/scale_free/4,6/averages.json',
@@ -153,6 +159,8 @@ X_scale_free_ini = [2,
                 16,
                 18,
                 20]
+
+label_scale_free_ini = "Number of initial nodes"
 
 small_world_p = ['data/small_world/4,0.1/averages.json', 
                    'data/small_world/4,0.2/averages.json', 
@@ -191,4 +199,4 @@ label_small_world_p = "Rewiring probability"
 
 std_dev_list = load_std_dev_files(SD_scale_free_ini)
 data_dict_list = load_json_files(scale_free_ini)
-plot_attributes_with_error_bars(data_dict_list, std_dev_list, X_scale_free_ini, label_small_world_p)
+plot_attributes_with_error_bars(data_dict_list, std_dev_list, X_scale_free_ini, label_scale_free_ini)

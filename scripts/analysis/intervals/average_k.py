@@ -18,8 +18,6 @@ def average_columns(csv_file):
 def write_averages_to_file(averages, csv_file, output_file):
     with open(output_file, 'a', newline='') as file:
         writer = csv.writer(file, delimiter=',')
-        writer.writerow(["File:", csv_file])
-        writer.writerow(["Averages"])
         for sublist in averages:
             writer.writerow(sublist)
 

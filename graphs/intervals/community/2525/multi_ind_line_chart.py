@@ -26,10 +26,10 @@ def plot_line_chart_from_csv(csv_file, y_column, title="Line Chart", x_label="X-
 def main():
     # Example CSV files (replace with your files)
     csv_files = [
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_reward-final0-25.csv",
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_reward-final25-50.csv",
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_reward-final50-75.csv",
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_reward-final75-100.csv",
+        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate0-25.csv",
+        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate25-50.csv",
+        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate50-75.csv",
+        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate75-100.csv",
     ]
 
     y_column = 0
@@ -56,11 +56,12 @@ def main():
         title = os.path.splitext(os.path.basename(csv_file))[0]
         all_titles.append(title)
 
+    all_titles = ["0-25", "25-50", "50-75", "75-100"]
+
     # Create line chart with all datasets on the same plot
     for x_values, y_values, title in zip(all_x_values, all_y_values, all_titles):
         plt.plot(x_values, y_values, label=title)
 
-    plt.title("Combined Line Chart")
     plt.xlabel("Generations")
     plt.ylabel("Cooperation rate")
     plt.legend()
