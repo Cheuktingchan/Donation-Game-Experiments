@@ -487,7 +487,7 @@ public class DonationGame {
             total += rewardsScaled[i];            
             if( rand.nextDouble() <= (rewardsScaled[i] / total)) selected = i;
         }
-        return selected;    
+        return selected;
     }
     
     public void rouletteWheelSelection() {

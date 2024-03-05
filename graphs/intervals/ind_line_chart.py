@@ -24,11 +24,11 @@ def plot_line_chart_from_csv(csv_file, y_column, title="Line Chart", x_label="X-
 
 def main():
     # Example CSV file (replace with your file)
-    csv_file = "data/intervals/random/0.5/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[2.0, 0.5]_intervals100_endNFalse_coop-rate0-100.csv"
+    csv_file = "data/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g1000_net[0.0]_intervals1_endNFalse_reward-variances0-100.csv"
 
     y_column = 0
 
-    plot_line_chart_from_csv(csv_file, y_column, title="", x_label="Generations", y_label="Cooperation rate", output_file="graphs/images/2_0.5_interval_sing.png")
+    plot_line_chart_from_csv(csv_file, y_column, title="", x_label="Generations", y_label="Reward variance", output_file="graphs/images/reward_var/0_sing_g1000.png")
 
 if __name__ == "__main__":
     main()
