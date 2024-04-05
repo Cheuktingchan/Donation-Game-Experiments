@@ -43,7 +43,8 @@ public class Simulation {
         options.addOption(new Option("fa", "forgiveness_action", false, "Enable action forgiveness"));
         options.addOption(new Option("fr", "forgiveness_reputation", false, "Enable reputation (assessment) forgiveness"));
         options.addOption(new Option("g", "generations", true, "Generations to run simulation for"));
-        options.addOption(new Option("endN", false, "End generations when a single k norm reached"));
+        options.addOption(new Option("endN", false, "End simulation when a single strategy norm is reached"));
+        options.addOption(new Option("local", false, "Local reproduction based on -outPart partitions"));
         options.addOption(new Option("intervals", true, "Data collected at intervals of generations"));
         Option outPartOption = Option.builder("outPart")
             .hasArgs()
@@ -52,7 +53,16 @@ public class Simulation {
         options.addOption(outPartOption);
         Option net = Option.builder("net")
         .hasArgs()
-        .desc("0 = Fully Connected, 1 = Bipartite, 2 = Random(n), 3 = Community(n,p), 4 = Scale-Free(n), 5 = Small-World(n,p)")
+        .desc("<network> \\ <parameter1> \\\n" + //
+                        "     <parameter2>: Network parameters.\\\\\n" + //
+                        "     Fully connected (network=0): No parameters.\\\\\n" + //
+                        "     Bipartite (network=1): No parameters.\\\\\n" + //
+                        "     Random (network=2): Parameter1 specifies connection probability (decimal from 0-1).\\\\\n" + //
+                        "     Community (network=3): Parameter1 specifies number of communities (integer divisible by n), and parameter2 specifies external link probability (decimal from 0-1).\\\\\n" + //
+                        "     Scale-free (network=4):\n" + //
+                        "     Parameter1 specifies the number of initial nodes (integer less than n).\\\\\n" + //
+                        "     Small-world (network=5):\n" + //
+                        "     Parameter1 specifies the neighbour distance (integer less than n), and parameter2 specifies rewiring probability (decimal from 0-1).")
         .build();
         options.addOption(net);
 
@@ -76,7 +86,8 @@ public class Simulation {
         int generations;
         boolean quiet;
         double[] network;
-        boolean endN; // whether endN mode is on
+        boolean endN;
+        boolean local;
         int intervals;
         int[][] outPartShape;
         if (cmd.hasOption("h")) {
@@ -88,6 +99,11 @@ public class Simulation {
             endN = true;
         } else {
             endN = false;
+        }
+        if(cmd.hasOption("local")) {
+            local = true;
+        } else {
+            local = false;
         }
         if(cmd.hasOption("net")) {
             String[] netStrs = cmd.getOptionValues("net");
@@ -227,7 +243,7 @@ public class Simulation {
         sb.append("_g" + generations );
         sb.append("_net" + Arrays.toString(network) );
         sb.append("_intervals" + intervals);
-        sb.append("_endN" + (endN ? "True" : "False") );
+        sb.append("_local" + (local ? "True" : "False") );
         String fileName = sb.toString();
         // output paths:
         List<Map<String, Path>> outPartPaths = new ArrayList<>();
@@ -266,6 +282,9 @@ public class Simulation {
         if (!generosity && !fa && !fr && ea == 0.0 && ep == 0.0) {
             System.out.println("Using DonationGame, i.e., without noise, generosity or forgiveness");
             game = new DonationGame(n, m, q, mr, preventNegativePayoffs, network, outPartShape);
+            if (local){
+                game.setLocalTrue();
+            }
         } else {
             if (generosity && (g1 > 0.0 || g2 > 0.0)) {
                 if (fa || fr) {

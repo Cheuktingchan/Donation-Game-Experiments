@@ -2,34 +2,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-def plot_line_chart_from_csv(csv_file, y_column, title="Line Chart", x_label="X-axis", y_label="Y-axis", output_file="graphs/images/csv_line_chart.png"):
-
-    # Extract x and y values from the DataFrame
-    df = pd.read_csv(csv_file, header=None)
-
-    # Extract y values from the DataFrame
-    y_values = df.iloc[y_column].str.split(';')[0][:-1] # takes first data from the 100 runs
-    y_values = [float(value) for value in y_values]  # Convert y values to float
-
-    # Create x values using row numbers as x values
-    x_values = [i for i in range(100, 100001, 100)]
-
-    # Create line chart
-    plt.plot(x_values, y_values, label="Data points", color='blue')  # Adjust marker and color as needed
-    plt.title(title)
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(output_file)
-
 def main():
     # Example CSV files (replace with your files)
     csv_files = [
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate0-25.csv",
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate25-50.csv",
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate50-75.csv",
-        "data/intervals/community/25-25-25-25/4,0.0/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 4.0, 0.0]_intervals100_endNFalse_coop-rate75-100.csv",
+        "data/intervals/community/g1000/25-25-25-25/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g1000_net[3.0, 4.0, 0.25]_intervals1_endNFalse_coop-rate0-25.csv",
+        "data/intervals/community/g1000/25-25-25-25/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g1000_net[3.0, 4.0, 0.25]_intervals1_endNFalse_coop-rate25-50.csv",
+        "data/intervals/community/g1000/25-25-25-25/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g1000_net[3.0, 4.0, 0.25]_intervals1_endNFalse_coop-rate50-75.csv",
+        "data/intervals/community/g1000/25-25-25-25/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g1000_net[3.0, 4.0, 0.25]_intervals1_endNFalse_coop-rate75-100.csv",
     ]
 
     y_column = 0
@@ -43,11 +22,11 @@ def main():
         df = pd.read_csv(csv_file, header=None)
 
         # Extract y values from the DataFrame
-        y_values = df.iloc[y_column].str.split(';')[0][:-1]
+        y_values = df.iloc[y_column].str.split(';')[0][:100]
         y_values = [float(value) for value in y_values]
 
         # Create x values using row numbers as x values
-        x_values = [i for i in range(100, 100001, 100)]
+        x_values = [i for i in range(1, 101, 1)]
 
         all_x_values.append(x_values)
         all_y_values.append(y_values)
@@ -66,7 +45,7 @@ def main():
     plt.ylabel("Cooperation rate")
     plt.legend()
     plt.grid(True)
-    plt.savefig("graphs/images/coop/combined_line_chart.png")
+    plt.savefig("graphs/images/coop/g100_25252525combined_line_chart.png")
 
 if __name__ == "__main__":
     main()

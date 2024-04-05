@@ -212,7 +212,7 @@ public class ForgivenessDonationGame extends NoisyDonationGame {
     }
 
     public void rouletteWheelSelection() {
-        double[] rewardsScaled = scaleRewards();
+        double[] rewardsScaled = scaleRewards(rewards);
         double totalReward = DoubleStream.of(rewardsScaled).sum();
         if (totalReward == 0.0) {
             System.out.println("Error: zero reward. Something went wrong.");

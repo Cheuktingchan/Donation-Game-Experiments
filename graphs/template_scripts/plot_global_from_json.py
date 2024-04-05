@@ -197,6 +197,110 @@ X_small_world_p = [0.1,
 
 label_small_world_p = "Rewiring probability"
 
-std_dev_list = load_std_dev_files(SD_scale_free_ini)
-data_dict_list = load_json_files(scale_free_ini)
-plot_attributes_with_error_bars(data_dict_list, std_dev_list, X_scale_free_ini, label_scale_free_ini)
+community_n = [
+                   'data/community/2/averages.json', 
+                   'data/community/3/averages.json', 
+                   'data/community/4(original)/global/averages.json',
+                   'data/community/5/averages.json', 
+                   'data/community/6/averages.json', 
+                   'data/community/7/averages.json', 
+                   'data/community/8/averages.json', 
+                   'data/community/9/averages.json', 
+                   'data/community/10/averages.json']
+
+SD_community_n = [
+                   'data/community/2/SDs.json', 
+                   'data/community/3/SDs.json', 
+                   'data/community/4(original)/global/SDs.json',
+                   'data/community/5/SDs.json', 
+                   'data/community/6/SDs.json', 
+                   'data/community/7/SDs.json', 
+                   'data/community/8/SDs.json', 
+                   'data/community/9/SDs.json', 
+                   'data/community/10/SDs.json']
+
+X_community_n = [2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10]
+
+label_community_n = "Number of communities"
+
+community_p = ['data/community/inter_p/4,0.1/averages.json',
+                   'data/community/inter_p/4,0.2/averages.json', 
+                   'data/community/inter_p/4,0.3/averages.json', 
+                   'data/community/inter_p/4,0.4/averages.json',
+                   'data/community/inter_p/4,0.5/averages.json', 
+                   'data/community/inter_p/4,0.6/averages.json', 
+                   'data/community/inter_p/4,0.7/averages.json', 
+                   'data/community/inter_p/4,0.8/averages.json', 
+                   'data/community/inter_p/4,0.9/averages.json',
+                   'data/community/inter_p/4,1/averages.json']
+
+SD_community_p = ['data/community/inter_p/4,0.1/SDs.json',
+                   'data/community/inter_p/4,0.2/SDs.json', 
+                   'data/community/inter_p/4,0.3/SDs.json', 
+                   'data/community/inter_p/4,0.4/SDs.json',
+                   'data/community/inter_p/4,0.5/SDs.json', 
+                   'data/community/inter_p/4,0.6/SDs.json', 
+                   'data/community/inter_p/4,0.7/SDs.json', 
+                   'data/community/inter_p/4,0.8/SDs.json', 
+                   'data/community/inter_p/4,0.9/SDs.json',
+                   'data/community/inter_p/4,1/SDs.json']
+
+X_community_p = [0.1,
+                    0.2,
+                    0.3,
+                    0.4,
+                    0.5,
+                    0.6,
+                    0.7,
+                    0.8,
+                    0.9,
+                    1]
+
+label_community_p = "External link probability"
+
+small_world_nei = ['data/small_world/neighbour/1/averages.json', 
+                   'data/small_world/neighbour/2/averages.json', 
+                   'data/small_world/neighbour/3/averages.json', 
+                   'data/small_world/neighbour/4/averages.json',
+                   'data/small_world/neighbour/5/averages.json', 
+                   'data/small_world/neighbour/6/averages.json', 
+                   'data/small_world/neighbour/7/averages.json', 
+                   'data/small_world/neighbour/8/averages.json', 
+                   'data/small_world/neighbour/9/averages.json', 
+                   'data/small_world/neighbour/10/averages.json']
+
+SD_small_world_nei = ['data/small_world/neighbour/1/SDs.json', 
+                   'data/small_world/neighbour/2/SDs.json', 
+                   'data/small_world/neighbour/3/SDs.json', 
+                   'data/small_world/neighbour/4/SDs.json',
+                   'data/small_world/neighbour/5/SDs.json', 
+                   'data/small_world/neighbour/6/SDs.json', 
+                   'data/small_world/neighbour/7/SDs.json', 
+                   'data/small_world/neighbour/8/SDs.json', 
+                   'data/small_world/neighbour/9/SDs.json', 
+                   'data/small_world/neighbour/10/SDs.json']
+
+X_small_world_nei = [1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10]
+
+label_small_world_nei = "Neighbour distance"
+
+std_dev_list = load_std_dev_files(SD_small_world_nei)
+data_dict_list = load_json_files(small_world_nei)
+plot_attributes_with_error_bars(data_dict_list, std_dev_list, X_small_world_nei, label_small_world_nei)

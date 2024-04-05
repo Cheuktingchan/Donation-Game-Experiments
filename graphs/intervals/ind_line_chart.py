@@ -18,17 +18,18 @@ def plot_line_chart_from_csv(csv_file, y_column, title="Line Chart", x_label="X-
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.legend()
+    #plt.legend()
     plt.grid(True)
     plt.savefig(output_file)
 
 def main():
     # Example CSV file (replace with your file)
-    csv_file = "data/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g1000_net[0.0]_intervals1_endNFalse_reward-variances0-100.csv"
+    csv_file = "data/intervals/original/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net0_intervals100_endNFalse_reward-variances0-100.csv"
 
-    y_column = 0
+    #for i in range(5):
+    #    y_column = i
+    #    plot_line_chart_from_csv(csv_file, y_column, title="", x_label="Generations", y_label="Cooperation rate", output_file="graphs/images/coop/5_4_0.25_sing_d" + str(i) + ".png")
 
-    plot_line_chart_from_csv(csv_file, y_column, title="", x_label="Generations", y_label="Reward variance", output_file="graphs/images/reward_var/0_sing_g1000.png")
-
+    plot_line_chart_from_csv(csv_file, 0, title="", x_label="Generations", y_label="Reward variance", output_file="graphs/images/reward_var/0_sing_var.png")
 if __name__ == "__main__":
     main()

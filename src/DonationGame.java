@@ -27,6 +27,7 @@ public class DonationGame {
     double[][] imageScores; // array for storing the current image scores
     double[] rewards; // array for storing the current rewards
     boolean preventNegativePayoffs; // whether to prevent negative rewards
+    boolean local; // whether to constrain local reproduction
     // NB: Nowak and Sigmund (NS) use the addition of 0.1 to both agents in an interaction to prevent negative payoffs 
     int[] coop_count; // number of donations used to calculate cooperation rate
     int[] act_count; // number of interations used to calculate cooperation rate
@@ -73,22 +74,6 @@ public class DonationGame {
         return newConnections;
     }
 
-    private static double[] calculateAttachmentProbabilities(Map<Integer, Set<Integer>> adjList) {
-        double[] probabilities = new double[adjList.size()];
-        int totalDegree = 0;
-
-        for (int node : adjList.keySet()) {
-            totalDegree += adjList.get(node).size();
-        }
-
-        for (int i = 0; i < probabilities.length; i++) {
-            double degreeRatio = (double) adjList.get(i).size() / totalDegree;
-            probabilities[i] = degreeRatio;
-        }
-
-        return probabilities;
-    }
-
     private static void printMatrix(boolean[][] matrix) {
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
@@ -117,6 +102,7 @@ public class DonationGame {
         this.mr = mr;
         this.network = network; // network is a array of double params specified below.
         this.preventNegativePayoffs = preventNegativePayoffs;
+        this.local = false;
         this.strategies = new int[n];
         for (int i = 0; i < strategies.length; i++) {
             strategies[i] = rand.nextInt(-5, 7);
@@ -129,7 +115,7 @@ public class DonationGame {
         this.adjMat = new boolean[n][n];
         this.edgeList = new ArrayList<int[]>();
         
-        // default network params: 
+        // default network parameters: 
         this.randomP = 0.5; // random(p)
 
         this.numCommunities = 4; // community(n,p)
@@ -452,12 +438,12 @@ public class DonationGame {
         }
     }
 
-    protected double[] scaleRewards() {
-        double[] result = rewards;
-        double min = Arrays.stream(rewards).summaryStatistics().getMin();
+    protected double[] scaleRewards(double[] rwrds) {
+        double[] result = rwrds;
+        double min = Arrays.stream(rwrds).summaryStatistics().getMin();
         if (min < 0.0) {
             double delta = min;
-            result = Arrays.stream(rewards).map(i -> i - delta).toArray();
+            result = Arrays.stream(rwrds).map(i -> i - delta).toArray();
             min = Arrays.stream(result).summaryStatistics().getMin();
         } 
         if (min == 0) {
@@ -491,24 +477,49 @@ public class DonationGame {
     }
     
     public void rouletteWheelSelection() {
-        double[] rewardsScaled = scaleRewards();
-        double totalReward = DoubleStream.of(rewardsScaled).sum();
-        if (totalReward == 0.0) {
-            System.out.println("Error: zero reward. Something went wrong.");
-            System.out.println("rewardScaled: " + Arrays.toString(rewardsScaled));
-            System.out.println("strategies: " + Arrays.toString(strategies));
-            System.exit(1);
+        if (local){
+            int cumInd = 0;
+            int[] newStrategies = new int[n];
+            for (int j = 0; j < outPartShape.length; j++){
+                cumInd += outPartShape[j].length;
+                double[] rewardsScaled = scaleRewards(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd));
+                double totalReward = DoubleStream.of(rewardsScaled).sum();
+                if (totalReward == 0.0) {
+                    System.out.println("Error: zero reward. Something went wrong.");
+                    System.out.println("rewardScaled: " + Arrays.toString(rewardsScaled));
+                    System.out.println("strategies: " + Arrays.toString(strategies));
+                    System.exit(1);
+                }
+                //System.out.println("newrewards: " + Arrays.toString(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd)));
+                for (int i = (cumInd-outPartShape[j].length); i < cumInd; i++) {
+                    newStrategies[i] = strategies[(cumInd-outPartShape[j].length) + weightedRandomChoice(rewardsScaled, totalReward)];
+                }
+                //System.out.println("newstrategies: " + Arrays.toString(newStrategies));
+            }
+            strategies = newStrategies;
+            //System.out.println("strategies: " + Arrays.toString(strategies));
+            Arrays.fill(rewards, 0.0);
+            Arrays.stream(imageScores).forEach(a -> Arrays.fill(a, 0));
+        }else{
+            double[] rewardsScaled = scaleRewards(rewards);
+            double totalReward = DoubleStream.of(rewardsScaled).sum();
+            if (totalReward == 0.0) {
+                System.out.println("Error: zero reward. Something went wrong.");
+                System.out.println("rewardScaled: " + Arrays.toString(rewardsScaled));
+                System.out.println("strategies: " + Arrays.toString(strategies));
+                System.exit(1);
+            }
+            int[] newStrategies = new int[n];
+            for (int i = 0; i < n; i++) {
+                newStrategies[i] = strategies[weightedRandomChoice(rewardsScaled, totalReward)];
+            }
+            strategies = newStrategies;
+            Arrays.fill(rewards, 0.0);
+            Arrays.stream(imageScores).forEach(a -> Arrays.fill(a, 0));
         }
-        int[] newStrategies = new int[n];
-        for (int i = 0; i < n; i++) {
-            newStrategies[i] = strategies[weightedRandomChoice(rewardsScaled, totalReward)];
-        }
-        strategies = newStrategies;
-        Arrays.fill(rewards, 0.0);
-        Arrays.stream(imageScores).forEach(a -> Arrays.fill(a, 0));
     }
 
-    public int getSingleKNormEmerged (int generations) { // -100 means no norm, -5 to 6 means k is a norm
+    public int getSingleKNormEmerged (int generations) { // -100 means no norm emerged, -5 to 6 means k is a norm
         int norm = -100;
         int[] stratCounts = new int[12];
         for (int i = 0; i < 12; i++) {
@@ -534,6 +545,9 @@ public class DonationGame {
         return -100;
     }
 
+    public void setLocalTrue(){
+        local = true;
+    }
     // simple main method to test things are working with toy instantiation 
     public static void main(String[] args) throws Exception {
         DonationGame game = new DonationGame(10, 30, 1.0, 0.001, false, new double[]{0}, new int[1][]);

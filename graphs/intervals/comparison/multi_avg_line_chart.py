@@ -39,8 +39,7 @@ def main():
         "data/intervals/small_world/4,0.25/average_n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.25]_intervals100_endNFalse_coop-rate0-100.csv",
         "data/intervals/small_world/4,0.75/average_n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[5.0, 4.0, 0.75]_intervals100_endNFalse_coop-rate0-100.csv"
     ]
-
-    data_legends = ["Random (p=0.08)", "Scale free (n=24)", "Small world (p=0.25)", "Small world (p=0.75)"]
+    data_legends = ["Random (p=0.08)", "Scale free (n=24)", "Small world (n=4, p=0.25)", "Small world (n=4, p=0.75)"]
     y_columns = [0, 0, 0, 0]  # Adjust column indices as needed
 
     plot_line_chart_from_csv(csv_files, data_legends, y_columns, title="Line Chart", x_label="Generations", y_label="Cooperation rate", output_file="graphs/images/comp_multi_interval_avg.png")
