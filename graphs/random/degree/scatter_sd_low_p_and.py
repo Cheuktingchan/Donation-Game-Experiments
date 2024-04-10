@@ -2,14 +2,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def plot_scatter_chart(x_values, y_values, std_dev_values, x_label="X-axis", y_label="Y-axis", output_file="graphs/images/2_n_coop_sd_low_p_present.png"):
-    plt.scatter(x_values, y_values, label="Data points", marker='o', color='blue')  # Adjust marker and color as needed
 
-    plt.errorbar(x_values, y_values, yerr=std_dev_values, fmt='none', ecolor='gray', label='Standard deviation')
-
+    plt.errorbar(
+    x_values,
+    y_values,
+    yerr=std_dev_values,  # Use 0 if standard deviation data is not available
+    marker='o',
+    label=f'Data points',
+    color="grey",
+    markerfacecolor="blue",
+    markeredgecolor="blue",
+    linestyle=''
+)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     #plt.legend()
-    plt.grid(True)
+
     plt.savefig(output_file)
     plt.show()
 

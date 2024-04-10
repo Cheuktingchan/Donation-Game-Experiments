@@ -69,11 +69,11 @@ def plot_attributes_with_error_bars(data_dict_list, std_dev_list, x_values, x_ax
         if attribute_name == "coop-rate":
             y_label = "Cooperation rate"
         elif attribute_name == "reward-averages":
-            y_label = "Reward averages (all generations)"
+            y_label = "Reward average (C)"
         elif attribute_name == "reward-final":
-            y_label = "Reward average (final generation)"
+            y_label = "Reward average (F)"
         elif attribute_name == "reward-variances":
-            y_label = "Reward variances (all generations)"
+            y_label = "Reward variance"
         plt.ylabel(y_label)
         #plt.legend()
         if x_axis == "Number of initial nodes":
@@ -301,6 +301,6 @@ X_small_world_nei = [1,
 
 label_small_world_nei = "Neighbour distance"
 
-std_dev_list = load_std_dev_files(SD_small_world_nei)
-data_dict_list = load_json_files(small_world_nei)
-plot_attributes_with_error_bars(data_dict_list, std_dev_list, X_small_world_nei, label_small_world_nei)
+std_dev_list = load_std_dev_files(SD_small_world_p)
+data_dict_list = load_json_files(small_world_p)
+plot_attributes_with_error_bars(data_dict_list, std_dev_list, X_small_world_p, label_small_world_p)

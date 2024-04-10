@@ -26,8 +26,8 @@ def plot_line_chart_from_csv(csv_file, y_column, title="Line Chart", x_label="X-
 def main():
     # Example CSV files (replace with your files)
     csv_files = [
-        "data/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 2.0, 0.0]_intervals100_localTrue_coop-rate0-50.csv",
-        "data/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[3.0, 2.0, 0.0]_intervals100_localTrue_coop-rate50-100.csv"
+        "data/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[0.0]_intervals100_localTrue_coop-rate0-50.csv",
+        "data/n100_m300_q1.0_mr0.001_ea0.000_ep0.000_nsFalse_genFalse_faFalse_frFalse_g100000_net[0.0]_intervals100_localTrue_coop-rate50-100.csv"
     ]
 
     y_column = 0
@@ -41,11 +41,11 @@ def main():
         df = pd.read_csv(csv_file, header=None)
 
         # Extract y values from the DataFrame
-        y_values = df.iloc[y_column].str.split(';')[0][:100]
+        y_values = df.iloc[y_column].str.split(';')[0][:-1]
         y_values = [float(value) for value in y_values]
 
         # Create x values using row numbers as x values
-        x_values = [i for i in range(1, 101, 1)]
+        x_values = [i for i in range(1, 100001, 100)]
 
         all_x_values.append(x_values)
         all_y_values.append(y_values)
@@ -62,7 +62,7 @@ def main():
     plt.ylabel("Cooperation rate")
     #plt.legend()
     plt.grid(True)
-    plt.savefig("graphs/images/coop/3_2_0,5050_local_ind.png")
+    plt.savefig("graphs/images/coop/0,5050_local_ind.png")
 
 if __name__ == "__main__":
     main()

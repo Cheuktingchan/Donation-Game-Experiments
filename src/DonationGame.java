@@ -34,7 +34,7 @@ public class DonationGame {
     int numConsecK; // number of consecutive generations that have reached a norm of K
 
     // 0 = Fully Connected, 1 = Bipartite, 2 = Random, 3 = Community, 4 = Scale-Free, 5 = Small-World
-    double[] network; // network[0] specifies network. Optional: network[1] specifies n, network[2] specifies p 
+    double[] network; // network[0] specifies network. Optional: network[1] specifies n, network[2] specifies p (see desc. for -net option)
     int[][] outPartShape;
     boolean[][] adjMat; // donor-recipient edges
     ArrayList<int[]> edgeList;
@@ -237,7 +237,7 @@ public class DonationGame {
             if (network.length >= 3){
                 rewiringP = network[2];
             }
-            // Initialize the regular ring lattice
+            // initialize the regular ring lattice
             for (int i = 0; i < n; i++) {
                 for (int j = i - neighborDistance; j <= i + neighborDistance; j++) {
                     if (j != i && j >= 0 && j < n) {
@@ -247,7 +247,7 @@ public class DonationGame {
                 }
             }
 
-            // Rewire edges with a certain probability
+            // rewire edges with a certain probability
             Random random = new Random();
             for (int i = 0; i < n; i++) {
                 for (int neighbor = 0; neighbor < n; neighbor++) {
@@ -478,11 +478,41 @@ public class DonationGame {
     
     public void rouletteWheelSelection() {
         if (local){
-            int cumInd = 0;
+            /*             int cumInd = 0;
+                        int[] newStrategies = new int[n];
+                        for (int j = 0; j < outPartShape.length; j++){
+                            cumInd += outPartShape[j].length;
+                            double[] rewardsScaled = scaleRewards(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd));
+                            double totalReward = DoubleStream.of(rewardsScaled).sum();
+                            if (totalReward == 0.0) {
+                                System.out.println("Error: zero reward. Something went wrong.");
+                                System.out.println("rewardScaled: " + Arrays.toString(rewardsScaled));
+                                System.out.println("strategies: " + Arrays.toString(strategies));
+                                System.exit(1);
+                            }
+                            //System.out.println("newrewards: " + Arrays.toString(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd)));
+                            for (int i = (cumInd-outPartShape[j].length); i < cumInd; i++) {
+                                newStrategies[i] = strategies[(cumInd-outPartShape[j].length) + weightedRandomChoice(rewardsScaled, totalReward)];
+                            }
+                            //System.out.println("newstrategies: " + Arrays.toString(newStrategies));
+                        }
+                        strategies = newStrategies;
+                        //System.out.println("strategies: " + Arrays.toString(strategies));
+                        Arrays.fill(rewards, 0.0);
+                        Arrays.stream(imageScores).forEach(a -> Arrays.fill(a, 0)); */
             int[] newStrategies = new int[n];
-            for (int j = 0; j < outPartShape.length; j++){
-                cumInd += outPartShape[j].length;
-                double[] rewardsScaled = scaleRewards(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd));
+            for (int i = 0; i < n; i++) {
+                ArrayList<Integer> thisRewardsIndices = new ArrayList<Integer>();
+                ArrayList<Double> thisRewardsList = new ArrayList<Double>(); // rewards to scale for this agent (if they are connected)
+
+                for (int r=0; r < n; r++){
+                    if (adjMat[i][r]){ // if connected
+                        thisRewardsList.add(rewards[r]);
+                        thisRewardsIndices.add(r);
+                    }
+                }
+
+                double[] rewardsScaled = scaleRewards(thisRewardsList.stream().mapToDouble(Double::doubleValue).toArray());
                 double totalReward = DoubleStream.of(rewardsScaled).sum();
                 if (totalReward == 0.0) {
                     System.out.println("Error: zero reward. Something went wrong.");
@@ -490,14 +520,9 @@ public class DonationGame {
                     System.out.println("strategies: " + Arrays.toString(strategies));
                     System.exit(1);
                 }
-                //System.out.println("newrewards: " + Arrays.toString(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd)));
-                for (int i = (cumInd-outPartShape[j].length); i < cumInd; i++) {
-                    newStrategies[i] = strategies[(cumInd-outPartShape[j].length) + weightedRandomChoice(rewardsScaled, totalReward)];
-                }
-                //System.out.println("newstrategies: " + Arrays.toString(newStrategies));
+                newStrategies[i] = strategies[thisRewardsIndices.get(weightedRandomChoice(rewardsScaled, totalReward))];
             }
             strategies = newStrategies;
-            //System.out.println("strategies: " + Arrays.toString(strategies));
             Arrays.fill(rewards, 0.0);
             Arrays.stream(imageScores).forEach(a -> Arrays.fill(a, 0));
         }else{
