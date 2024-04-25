@@ -13,7 +13,7 @@ python_script="scripts/analysis/intervals/average_x_file.py"
 root_folder="$1"
 
 # Find all files recursively starting with "n100" and not containing "kAvFreq" or "kFinFreq"
-files=$(find "$root_folder" -type f -name "n100*" ! -name "*kAvFreq*" ! -name "*kFinFreq*")
+files=$(find "$root_folder" -type f -name "n200*" ! -name "*kAvFreq*" ! -name "*kFinFreq*")
 
 # Loop through the files and run the Python script with each file as an argument
 IFS=$'\n' # Set Internal Field Separator to handle spaces in filenames

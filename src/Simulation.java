@@ -17,6 +17,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import java.util.random.*;
 
 // Class for running the simulations described by
 // N. Griffiths and N. Oren, 'Generosity and the Emergence of Forgiveness in the Donation Game', in
@@ -328,7 +329,6 @@ public class Simulation {
             }
             k_counts.add(cur_counts);
         }
-
         for (int i = 0; i < generations; i++) {
             game.tick();
             if (endN){

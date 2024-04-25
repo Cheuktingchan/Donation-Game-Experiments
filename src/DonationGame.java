@@ -188,6 +188,10 @@ public class DonationGame {
                     }
                 }
             }
+            /*             for (int i = 0; i < 1; i++){
+                            this.adjMat[i][n-1-i] = true;
+                            this.adjMat[n-1-i][i] = true;
+                        } */
         } else if (network[0] == 4){ // scale-free
             if (network.length >= 2){
                 initialNodes = (int) network[1];
@@ -478,28 +482,6 @@ public class DonationGame {
     
     public void rouletteWheelSelection() {
         if (local){
-            /*             int cumInd = 0;
-                        int[] newStrategies = new int[n];
-                        for (int j = 0; j < outPartShape.length; j++){
-                            cumInd += outPartShape[j].length;
-                            double[] rewardsScaled = scaleRewards(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd));
-                            double totalReward = DoubleStream.of(rewardsScaled).sum();
-                            if (totalReward == 0.0) {
-                                System.out.println("Error: zero reward. Something went wrong.");
-                                System.out.println("rewardScaled: " + Arrays.toString(rewardsScaled));
-                                System.out.println("strategies: " + Arrays.toString(strategies));
-                                System.exit(1);
-                            }
-                            //System.out.println("newrewards: " + Arrays.toString(Arrays.copyOfRange(rewards, (cumInd-outPartShape[j].length), cumInd)));
-                            for (int i = (cumInd-outPartShape[j].length); i < cumInd; i++) {
-                                newStrategies[i] = strategies[(cumInd-outPartShape[j].length) + weightedRandomChoice(rewardsScaled, totalReward)];
-                            }
-                            //System.out.println("newstrategies: " + Arrays.toString(newStrategies));
-                        }
-                        strategies = newStrategies;
-                        //System.out.println("strategies: " + Arrays.toString(strategies));
-                        Arrays.fill(rewards, 0.0);
-                        Arrays.stream(imageScores).forEach(a -> Arrays.fill(a, 0)); */
             int[] newStrategies = new int[n];
             for (int i = 0; i < n; i++) {
                 ArrayList<Integer> thisRewardsIndices = new ArrayList<Integer>();

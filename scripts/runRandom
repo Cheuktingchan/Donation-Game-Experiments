@@ -2,5 +2,14 @@
 for k in {1..100}
 do
   echo run number ${k}
-  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -n 500 -m 1500 -net 2 0.5 -quiet -intervals 100
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.1 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.2 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.3 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.4 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.5 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.6 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.7 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.8 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 0.9 -quiet -n 200 -m 300
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -net 5 4 1 -quiet -n 200 -m 300
 done

@@ -2,5 +2,6 @@
 for k in {1..100}
 do
   echo run number ${k}
-  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 1000 -net 1 -quiet -intervals 1 -outPart 50 50
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -outPart 50 50 -quiet -net 3 2 0.005
+  java -classpath .:./bin:./lib/commons-cli-1.5.0/commons-cli-1.5.0.jar Simulation -g 100000 -outPart 50 50-quiet -net 3 2 0.001
 done

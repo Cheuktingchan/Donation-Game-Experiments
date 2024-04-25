@@ -28,7 +28,7 @@ with open(csv_file_path, newline='') as csvfile:
         if row[0] == 'File:':
             current_file = row[1]
         else:
-            current_file = remove_common_substring(current_file, "data/", "endNFalse_")
+            current_file = remove_common_substring(current_file, "data/", "localTrue_")
             current_file = remove_common_substring(current_file, "0-100", "csv")
             data[current_file] = list(map(float, row[1:]))
 
