@@ -188,10 +188,6 @@ public class DonationGame {
                     }
                 }
             }
-            /*             for (int i = 0; i < 1; i++){
-                            this.adjMat[i][n-1-i] = true;
-                            this.adjMat[n-1-i][i] = true;
-                        } */
         } else if (network[0] == 4){ // scale-free
             if (network.length >= 2){
                 initialNodes = (int) network[1];
@@ -293,17 +289,6 @@ public class DonationGame {
                 }
             }
         }
-        System.out.println("TEXT");
-        System.out.println("#edges:");
-        System.out.println(getNumEdges(this.adjMat));
-        System.out.println();
-/*         try{
-            PrintWriter pr = new PrintWriter(new FileWriter("edges.txt", true));
-            pr.println(getNumEdges(this.adjMat));
-            pr.close();
-        }catch (IOException e){
-            System.err.println("File not found: " + e.getMessage());
-        } */
     }
     
     public int[] getStrategies() {

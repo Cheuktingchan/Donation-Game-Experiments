@@ -59,3 +59,18 @@ which should give the following output:
     -quiet                         Run with minimal output
 
 The scripts used to generate the main results in the paper are contained in the scripts directory. Note that the forgiveness scripts will try to run 18 simulations simultaneously so if you have limited cores you may wish to run them individually.
+
+## Network Simulation Parameters
+
+-net <network> <parameter1> <parameter2>        Network parameters:
+                                                Fully connected (network = 0): No parameters.
+                                                Bipartite (network = 1): No parameters.
+                                                Random (network = 2): Parameter1 specifies connection probability (decimal from 0-1).
+                                                Community (network = 3): Parameter1 specifies the number of communities (integer divisible by n), and parameter2 specifies external link probability (decimal from 0-1).
+                                                Scale-free (network = 4): Parameter1 specifies the number of initial nodes (integer less than n).
+                                                Small-world (network = 5): Parameter1 specifies the neighbour distance (integer less than n), and parameter2 specifies rewiring probability (decimal from 0-1).
+
+-outPart <args>                                 Specifies partitions to the output metrics (a list of integers which total n).
+-intervals <arg>                                Specify intervals at which to collect metrics (integer less than g).
+-local:                                         Constrains the reproduction pool to direct neighbours only.
+-endN:                                          Ends the simulation when a strategy reaches 100 consecutive generations of above 0.98 relative frequency and outputs the number of generations taken.
